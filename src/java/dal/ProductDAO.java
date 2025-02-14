@@ -5,8 +5,6 @@ package dal;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 import context.DBContext;
-import dal.CategoryDAO;
-import dal.SupplierDAO;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
