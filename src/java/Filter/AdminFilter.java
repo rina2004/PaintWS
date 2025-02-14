@@ -35,6 +35,7 @@ public class AdminFilter implements Filter {
     public AdminFilter() {
     }
 
+    @SuppressWarnings("unchecked")
     private void doBeforeProcessing(ServletRequest request, ServletResponse response)
             throws IOException, ServletException {
         if (debug) {
@@ -63,6 +64,7 @@ public class AdminFilter implements Filter {
          */
     }
 
+    @SuppressWarnings("unchecked")
     private void doAfterProcessing(ServletRequest request, ServletResponse response)
             throws IOException, ServletException {
         if (debug) {
