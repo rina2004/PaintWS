@@ -17,6 +17,8 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.User;
 
 /**
@@ -36,7 +38,7 @@ public class AdminFilter implements Filter {
     }
 
     private void doBeforeProcessing(ServletRequest request, ServletResponse response)
-            throws IOException, ServletException {
+            throws ServletException {
         if (debug) {
             log("AdminFilter:DoBeforeProcessing");
         }
@@ -207,6 +209,8 @@ public class AdminFilter implements Filter {
                 ps.close();
                 response.getOutputStream().close();
             } catch (Exception ex) {
+                System.err.println("Error while writing stack trace: " + ex.getMessage());
+                ex.printStackTrace();
             }
         } else {
             try {
@@ -215,6 +219,8 @@ public class AdminFilter implements Filter {
                 ps.close();
                 response.getOutputStream().close();
             } catch (Exception ex) {
+                System.err.println("Error while writing stack trace: " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
     }
