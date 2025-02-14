@@ -162,18 +162,19 @@ public class AdminFilter implements Filter {
     /**
      * Destroy method for this filter
      */
+    @Override
     public void destroy() {
     }
 
     /**
      * Init method for this filter
+     * @param filterConfig
      */
+    @Override
     public void init(FilterConfig filterConfig) {
         this.filterConfig = filterConfig;
-        if (filterConfig != null) {
-            if (debug) {
+        if (filterConfig != null && debug) {
                 log("AdminFilter:Initializing filter");
-            }
         }
     }
 
