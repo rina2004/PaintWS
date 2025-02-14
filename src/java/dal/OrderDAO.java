@@ -29,7 +29,7 @@ public class OrderDAO extends DBContext {
             String sql1 = "INSERT INTO [dbo].[Orders] ([Date], [UserID], [TotalMoney], [status]) VALUES (?,?,?,?)";
             PreparedStatement st1 = connection.prepareStatement(sql1);
             st1.setString(1, date);
-            st1.setInt(2, cus.getUserID());  // Đảm bảo dùng UserID thay vì UserName
+            st1.setInt(2, cus.getUserID());
             st1.setDouble(3, cart.getTotalPrice());
             st1.setInt(4, 0);
             st1.executeUpdate();
@@ -39,10 +39,10 @@ public class OrderDAO extends DBContext {
             PreparedStatement st2 = connection.prepareStatement(sql2);
             ResultSet rs = st2.executeQuery();
 
-            // Thêm các chi tiết đơn hàng vào bảng OrderDetails (sử dụng batch processing)
             if (rs.next()) {
                 int oID = rs.getInt(1);
 
+                // ✅ Tạo PreparedStatement 1 lần duy nhất
                 String sql3 = "INSERT INTO [dbo].[OrderDetails] ([OrderID], [ProductID], [Quantity], [UnitPrice]) VALUES (?,?,?,?)";
                 PreparedStatement st3 = connection.prepareStatement(sql3);
 
@@ -51,13 +51,12 @@ public class OrderDAO extends DBContext {
                     st3.setInt(2, item.getProduct().getProductID());
                     st3.setDouble(3, item.getQuantity());
                     st3.setDouble(4, item.getProduct().getUnitPrice());
-                    st3.addBatch();  // Thêm vào batch thay vì thực thi ngay
+                    st3.addBatch();  
 
                     // Cập nhật số lượng sản phẩm
                     pd.updateValueProduct(item.getProduct(), item.getQuantity());
                 }
-
-                st3.executeBatch(); // Thực thi tất cả các lệnh SQL trong một lần gọi
+                st3.executeBatch(); 
             }
         } catch (SQLException e) {
             System.out.println(e);
