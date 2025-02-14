@@ -23,6 +23,7 @@ public class OrderDAO extends DBContext {
         ProductDAO pd = new ProductDAO();
         LocalDate curDate = java.time.LocalDate.now();
         String date = curDate.toString();
+
         try {
             // Thêm đơn hàng vào bảng Orders
             String sql1 = "INSERT INTO [dbo].[Orders] ([Date], [UserID], [TotalMoney], [status]) VALUES (?,?,?,?)";
@@ -38,21 +39,25 @@ public class OrderDAO extends DBContext {
             PreparedStatement st2 = connection.prepareStatement(sql2);
             ResultSet rs = st2.executeQuery();
 
-            // Thêm các chi tiết đơn hàng vào bảng OrderDetails
+            // Thêm các chi tiết đơn hàng vào bảng OrderDetails (sử dụng batch processing)
             if (rs.next()) {
                 int oID = rs.getInt(1);
+
+                String sql3 = "INSERT INTO [dbo].[OrderDetails] ([OrderID], [ProductID], [Quantity], [UnitPrice]) VALUES (?,?,?,?)";
+                PreparedStatement st3 = connection.prepareStatement(sql3);
+
                 for (Item item : cart.getListItems()) {
-                    String sql3 = "INSERT INTO [dbo].[OrderDetails] ([OrderID], [ProductID], [Quantity], [UnitPrice]) VALUES (?,?,?,?)";
-                    PreparedStatement st3 = connection.prepareStatement(sql3);
                     st3.setInt(1, oID);
                     st3.setInt(2, item.getProduct().getProductID());
-                    st3.setDouble(3, item.getQuantity());  // Cập nhật thành Double nếu cần
+                    st3.setDouble(3, item.getQuantity());
                     st3.setDouble(4, item.getProduct().getUnitPrice());
-                    st3.executeUpdate();
+                    st3.addBatch();  // Thêm vào batch thay vì thực thi ngay
 
                     // Cập nhật số lượng sản phẩm
                     pd.updateValueProduct(item.getProduct(), item.getQuantity());
                 }
+
+                st3.executeBatch(); // Thực thi tất cả các lệnh SQL trong một lần gọi
             }
         } catch (SQLException e) {
             System.out.println(e);
