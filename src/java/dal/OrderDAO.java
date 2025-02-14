@@ -42,7 +42,7 @@ public class OrderDAO extends DBContext {
             if (rs.next()) {
                 int oID = rs.getInt(1);
 
-                // ✅ Tạo PreparedStatement 1 lần duy nhất
+               
                 String sql3 = "INSERT INTO [dbo].[OrderDetails] ([OrderID], [ProductID], [Quantity], [UnitPrice]) VALUES (?,?,?,?)";
                 PreparedStatement st3 = connection.prepareStatement(sql3);
 
