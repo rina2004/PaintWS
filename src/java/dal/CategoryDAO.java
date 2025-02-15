@@ -4,7 +4,6 @@ package dal;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 import context.DBContext;
 import java.lang.System.Logger.Level;
 import java.sql.PreparedStatement;
@@ -45,8 +44,10 @@ public class CategoryDAO extends DBContext {
     }
 
     public Category getCategoryById(int id) {
-        String sql = "SELECT * FROM [dbo].[Categories] WHERE CategoryID = ?";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
+        String sql = "SELECT CategoryID, CategoryName, Description FROM [dbo].[Categories] WHERE CategoryID = ?";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, id);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
@@ -61,13 +62,13 @@ public class CategoryDAO extends DBContext {
         }
         return null;
     }
-    
-     public static void main(String[] args) {
+
+    public static void main(String[] args) {
         CategoryDAO dao = new CategoryDAO();
         List<Category> list = dao.getAll();
-         for (Category o : list) {
-             System.out.println(o); 
-         }
+        for (Category o : list) {
+            System.out.println(o);
+        }
     }
 
 }
