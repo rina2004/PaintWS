@@ -37,7 +37,7 @@ public class AdminFilter implements Filter {
 
     @SuppressWarnings("unchecked")
     private void doBeforeProcessing(ServletRequest request, ServletResponse response)
-            throws IOException, ServletException {
+            throws ServletException {
         if (debug) {
             log("AdminFilter:DoBeforeProcessing");
         }
@@ -66,7 +66,7 @@ public class AdminFilter implements Filter {
 
     @SuppressWarnings("unchecked")
     private void doAfterProcessing(ServletRequest request, ServletResponse response)
-            throws IOException, ServletException {
+            throws ServletException {
         if (debug) {
             log("AdminFilter:DoAfterProcessing");
         }
@@ -210,6 +210,7 @@ public class AdminFilter implements Filter {
                 ps.close();
                 response.getOutputStream().close();
             } catch (Exception ex) {
+                System.out.println("Error while writing stack trace: " + ex.getMessage());
             }
         } else {
             try {
@@ -218,6 +219,7 @@ public class AdminFilter implements Filter {
                 ps.close();
                 response.getOutputStream().close();
             } catch (Exception ex) {
+                System.out.println("Error while writing stack trace: " + ex.getMessage());
             }
         }
     }
