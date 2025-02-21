@@ -215,6 +215,7 @@ public class AdminFilter implements Filter {
                 ps.close();
                 response.getOutputStream().close();
             } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
     }
