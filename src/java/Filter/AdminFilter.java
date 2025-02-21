@@ -32,9 +32,6 @@ public class AdminFilter implements Filter {
     // configured. 
     private FilterConfig filterConfig = null;
 
-    public AdminFilter() {
-    }
-
     @SuppressWarnings("unchecked")
     private void doBeforeProcessing(ServletRequest request, ServletResponse response)
             throws ServletException {
