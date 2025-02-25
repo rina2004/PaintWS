@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-           
+
             <div id="editEmployeeModal">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -50,9 +50,10 @@
                             </div>
                             <div class="modal-body">
                                 <div class="form-group">
-                                    <label>Product ID</label>
-                                    <input value="${detail.productID}" name="id" type="text" class="form-control" readonly required>
+                                    <label for="product-id">Product ID</label>
+                                    <input id="product-id" value="${detail.productID}" name="id" type="text" class="form-control" readonly required>
                                 </div>
+
                                 <div class="form-group">
                                     <label>Name</label>
                                     <input value="${detail.productName}" name="name" type="text" class="form-control" required>

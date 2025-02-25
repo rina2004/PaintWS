@@ -5,8 +5,6 @@ package dal;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 import context.DBContext;
-import dal.CategoryDAO;
-import dal.SupplierDAO;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,9 +20,10 @@ import model.Supplier;
  * @author anhbu
  */
 public class ProductDAO extends DBContext {
-
-    private final CategoryDAO cd = new CategoryDAO();
-    private final SupplierDAO sd = new SupplierDAO();
+    private CategoryDAO cd;
+    private SupplierDAO sd;
+    private static final String CATEGORY_ID = "CategoryID";
+    private static final String SUPPLIER_ID = "SupplerID";
 
     public List<Product> getAll() {
         List<Product> list = new ArrayList<>();
@@ -33,8 +32,8 @@ public class ProductDAO extends DBContext {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
-                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
+                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
+                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
                 Product p = new Product(
                         rs.getInt("ProductID"),
                         rs.getString("ProductName"),
@@ -78,8 +77,8 @@ public class ProductDAO extends DBContext {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
-                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
+                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
+                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
                 Product p = new Product(
                         rs.getInt("ProductID"),
                         rs.getString("ProductName"),
@@ -109,8 +108,8 @@ public class ProductDAO extends DBContext {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
-                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
+                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
+                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
                 Product p = new Product(
                         rs.getInt("ProductID"),
                         rs.getString("ProductName"),
@@ -140,8 +139,8 @@ public class ProductDAO extends DBContext {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
-                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
+                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
+                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
                 Product p = new Product(
                         rs.getInt("ProductID"),
                         rs.getString("ProductName"),
@@ -174,8 +173,8 @@ public class ProductDAO extends DBContext {
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
-                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
+                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
+                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
 
                 Product p = new Product(
                         rs.getInt("ProductID"),
@@ -209,8 +208,8 @@ public class ProductDAO extends DBContext {
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
-                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
+                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
+                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
 
                 Product p = new Product(
                         rs.getInt("ProductID"),
@@ -244,8 +243,8 @@ public class ProductDAO extends DBContext {
             st.setString(1, name); // This stays the same
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
-                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
+                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
+                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
 
                 Product p = new Product(
                         rs.getInt("ProductID"),

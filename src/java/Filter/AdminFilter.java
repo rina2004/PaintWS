@@ -35,7 +35,6 @@ public class AdminFilter implements Filter {
     public AdminFilter() {
     }
 
-    @SuppressWarnings("unchecked")
     private void doBeforeProcessing(ServletRequest request, ServletResponse response)
             throws IOException, ServletException {
         if (debug) {
@@ -64,7 +63,6 @@ public class AdminFilter implements Filter {
          */
     }
 
-    @SuppressWarnings("unchecked")
     private void doAfterProcessing(ServletRequest request, ServletResponse response)
             throws IOException, ServletException {
         if (debug) {
@@ -85,7 +83,7 @@ public class AdminFilter implements Filter {
          */
         // For example, a filter might append something to the response.
         /*
-	PrintWriter respOut = new PrintWriter(response.getWriter());
+	
 	respOut.println("<P><B>This has been appended by an intrusive filter.</B>");
          */
     }
@@ -162,19 +160,18 @@ public class AdminFilter implements Filter {
     /**
      * Destroy method for this filter
      */
-    @Override
     public void destroy() {
     }
 
     /**
      * Init method for this filter
-     * @param filterConfig
      */
-    @Override
     public void init(FilterConfig filterConfig) {
         this.filterConfig = filterConfig;
-        if (filterConfig != null && debug) {
+        if (filterConfig != null) {
+            if (debug) {
                 log("AdminFilter:Initializing filter");
+            }
         }
     }
 
@@ -218,6 +215,7 @@ public class AdminFilter implements Filter {
                 ps.close();
                 response.getOutputStream().close();
             } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
     }
