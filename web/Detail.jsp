@@ -120,12 +120,12 @@
                                 <a class="nav-link text-dark" aria-current="page" href="${pageContext.request.contextPath}/home">Home</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="categoriesDropdown" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+                                <button class="nav-link dropdown-toggle text-dark" id="categoriesDropdown" data-mdb-toggle="dropdown" aria-expanded="false">
                                     Categories
-                                </a>
+                                </button>
                                 <!-- Drop down menu -->
                                 <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
-                                    <!-- Lặp qua danh sách categories và hiển thị -->
+                                    <!-- Loop for category list -->
                                     <c:forEach var="category" items="${listC}">
                                         <li><a class="dropdown-item category-item" href="category?id=${category.id}">${category.name}</a></li>
                                         </c:forEach>
