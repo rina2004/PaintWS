@@ -41,7 +41,6 @@ body {
     border: none;
     min-width: 50px;
     border-radius: 2px;
-    border: none;
     outline: none !important;
     margin-left: 10px;
 }
@@ -152,11 +151,9 @@ table.table .avatar {
     margin: 5px 0 0 3px;
     z-index: 9;
 }
-.custom-checkbox label:before{
+.custom-checkbox label:before {
     width: 18px;
     height: 18px;
-}
-.custom-checkbox label:before {
     content: '';
     margin-right: 10px;
     display: inline-block;
