@@ -1,24 +1,17 @@
-package dal;
-
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
+package dal;
 import context.DBContext;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.*;
+import java.util.*;
 import model.Supplier;
-
 /**
  *
  * @author anhbu
  */
 public class SupplierDAO extends DBContext {
-
     public List<Supplier> getAll() {
         List<Supplier> list = new ArrayList<>();
         String sql = "SELECT * FROM Suppliers";
@@ -34,13 +27,9 @@ public class SupplierDAO extends DBContext {
                 s.setPhone(rs.getString("Phone"));
                 list.add(s);
             }
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-
+        } catch (SQLException e){ System.out.println(e);}
         return list;
     }
-
     public Supplier getSupplierById(int id) {
         String sql = "SELECT * FROM [dbo].[Suppliers] WHERE SupplierID = ?";
         try {
@@ -56,10 +45,7 @@ public class SupplierDAO extends DBContext {
                         rs.getString("Phone")
                 );
             }
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
+        } catch (SQLException e){ System.out.println(e);}
         return null;
     }
-
 }
