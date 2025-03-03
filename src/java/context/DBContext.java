@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * @author FPT University - PRJ30X
  */
 public class DBContext {
-    protected Connection connection;
+    public Connection connection;
     public DBContext()
     {
         //@Students: You are allowed to edit user, pass, url variables to fit 
@@ -28,8 +28,8 @@ public class DBContext {
         // For example : StudentDBContext extends DBContext , 
         //where StudentDBContext is located in dal package, 
         try {
-            String user = "sa";
-            String pass = "paintws123";
+            String user = "rina";
+            String pass = "26122004";
             String url = "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;databaseName=Paint_Store";
             connection = DriverManager.getConnection(url, user, pass);
         } catch (SQLException ex) {

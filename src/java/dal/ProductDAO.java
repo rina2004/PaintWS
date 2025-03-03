@@ -20,8 +20,9 @@ import model.Supplier;
  * @author anhbu
  */
 public class ProductDAO extends DBContext {
-    private CategoryDAO cd;
-    private SupplierDAO sd;
+
+    public CategoryDAO cd;
+    public SupplierDAO sd;
     private static final String CATEGORY_ID = "CategoryID";
     private static final String SUPPLIER_ID = "SupplerID";
 
