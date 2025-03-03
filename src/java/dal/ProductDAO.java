@@ -21,10 +21,10 @@ import model.Supplier;
  */
 public class ProductDAO extends DBContext {
 
-    private final CategoryDAO cd = new CategoryDAO();
-    private final SupplierDAO sd = new SupplierDAO();
+    public CategoryDAO cd;
+    public SupplierDAO sd;
     private static final String CATEGORY_ID = "CategoryID";
-    private static final String SUPPLIER_ID = "SupplierID";
+    private static final String SUPPLIER_ID = "SupplerID";
 
     public List<Product> getAll() {
         List<Product> list = new ArrayList<>();
@@ -63,7 +63,7 @@ public class ProductDAO extends DBContext {
         ProductDAO dao = new ProductDAO();
 
         // Kiểm tra một sản phẩm với ID cụ thể
-        Product product = dao.getProductByID("5"); // Thay "1" bằng ID sản phẩm bạn muốn kiểm tra
+        Product product = dao.getProductByID("1"); // Thay "1" bằng ID sản phẩm bạn muốn kiểm tra
 
         if (product != null) {
             System.out.println("Sản phẩm tìm thấy: " + product);
@@ -273,17 +273,19 @@ public class ProductDAO extends DBContext {
 
     public int deleteProduct(String pid) {
         String sql = "DELETE FROM [dbo].[Paints] WHERE ProductID = ?";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setString(1, pid);
-            return st.executeUpdate();
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, pid); // Gán giá trị 'pid' cho tham số ProductID trong câu truy vấn
+            return st.executeUpdate(); // Trả về số dòng bị ảnh hưởng
         } catch (SQLException e) {
-            throw new RuntimeException("Lỗi khi xóa sản phẩm với ID: " + pid, e);
+            System.out.println("Error during deletion: " + e.getMessage());
         }
+        return 0; // Trả về 0 nếu không xóa được sản phẩm nào
     }
 
     public void insertProduct(String name, String image, String price, String stock,
-            String sold, String volume, String color, String supplierID,
-            String description, String categoryID, String discontinued, String status) {
+            String sold, String volume, String color, String supplier,
+            String description, String category, String discontinued, String status) {
 
         // Kiểm tra xem sản phẩm đã tồn tại
         if (productExists(name)) {
@@ -296,8 +298,8 @@ public class ProductDAO extends DBContext {
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             // Thiết lập các giá trị vào câu lệnh SQL
             st.setString(1, name);
-            st.setInt(2, Integer.parseInt(supplierID));  // SupplierID
-            st.setInt(3, Integer.parseInt(categoryID));  // CategoryID
+            st.setInt(2, Integer.parseInt(supplier));  // SupplierID
+            st.setInt(3, Integer.parseInt(category));  // CategoryID
             st.setDouble(4, Double.parseDouble(volume));  // Volume
             st.setString(5, color);
             st.setBigDecimal(6, new BigDecimal(price));  // UnitPrice
@@ -313,12 +315,11 @@ public class ProductDAO extends DBContext {
             st.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Lỗi khi chèn sản phẩm", e);
         }
     }
 
 // Phương thức kiểm tra xem sản phẩm đã tồn tại hay chưa
-    public boolean productExists(String name) {
+    private boolean productExists(String name) {
         String sql = "SELECT COUNT(*) FROM Paints WHERE ProductName = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, name);
@@ -327,7 +328,6 @@ public class ProductDAO extends DBContext {
                 return rs.getInt(1) > 0; // Nếu có sản phẩm, trả về true
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Lỗi khi kiểm tra sản phẩm tồn tại", e);
         }
         return false; // Nếu không có sản phẩm, trả về false
     }
@@ -406,45 +406,14 @@ public class ProductDAO extends DBContext {
     }
 
     public void updateProductStatus(String productName, boolean status) {
-        String sql = "UPDATE [dbo].[Paints] SET [Status] = ? WHERE [ProductName] = ?";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
+        try {
+            String sql = "UPDATE [dbo].[Paints] SET [Status] = ? WHERE [ProductName] = ?";
+            PreparedStatement st = connection.prepareStatement(sql);
             st.setBoolean(1, status);
             st.setString(2, productName);
-            int affectedRows = st.executeUpdate();
-            if (affectedRows == 0) {
-                System.out.println("No products found: " + productName);
-            }
+            st.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace(); // In stack trace để dễ debug hơn
-        }
-    }
-
-    public Boolean getProductStatus(String productName) {
-        String sql = "SELECT Status FROM Paints WHERE ProductName = ?";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setString(1, productName);
-            try (ResultSet rs = st.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getBoolean("Status");
-                } else {
-                    System.out.println("No products found: " + productName);
-                    return null; // Trả về null nếu không tìm thấy sản phẩm
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null; // Trả về null trong trường hợp lỗi SQL
-    }
-
-    public void closeConnection() {
-        if (connection != null) {
-            try {
-                connection.close();
-                System.out.println("Database connection closed successfully.");
-            } catch (SQLException e) {
-                throw new RuntimeException("Lỗi khi đóng kết nối cơ sở dữ liệu", e);
-            }
+            System.out.println(e);
         }
     }
 
