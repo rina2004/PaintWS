@@ -65,14 +65,14 @@ public class ChartControl extends HttpServlet {
         List<BestSellingProduct> bestSellers = dao.getBestSellingProducts();
         List<BestSellingProduct> topSellers = dao.getTopSellingProducts(topLimit);
         List<CategorySales> categorySales = dao.getSalesByCategory();
-        List<MonthlySales> monthlySales = dao.getMonthlySales();
+//        List<MonthlySales> monthlySales = dao.getMonthlySales();
         Map<String, Object> comparison = dao.compareMonthlyRevenue(month1, month2);
         
         // Set attributes for JSP
         request.setAttribute("bestSellers", bestSellers);
         request.setAttribute("topSellers", topSellers);
         request.setAttribute("categorySales", categorySales);
-        request.setAttribute("monthlySales", monthlySales);
+//        request.setAttribute("monthlySales", monthlySales);
         request.setAttribute("comparison", comparison);
         
         // Forward to JSP

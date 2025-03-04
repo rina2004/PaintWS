@@ -211,7 +211,7 @@
                 </div>
 
                 <!-- Monthly Sales Chart -->
-                <div class="chart-box">
+                <div hidden class="chart-box">
                     <div class="chart-header">
                         <h2 class="chart-title">Doanh thu theo tháng</h2>
                     </div>

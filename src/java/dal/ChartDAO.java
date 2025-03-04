@@ -11,7 +11,7 @@ import model.*;
 
 /**
  *
- * @author anhbu
+ * @author lytu
  */
 public class ChartDAO extends DBContext{
     //Retrieves the best selling products ordered by quantity sold
@@ -92,32 +92,32 @@ public class ChartDAO extends DBContext{
         return categorySales;
     }
     
-    //Retrieves monthly sales data for the current year
-    public List<MonthlySales> getMonthlySales() {
-        List<MonthlySales> monthlySales = new ArrayList<>();
-        String sql = """
-            SELECT 
-                MONTH(o.Date) AS Month,
-                SUM(od.Quantity * od.UnitPrice * (1 - COALESCE(od.Discount, 0))) AS Revenue
-            FROM Orders o
-            JOIN OrderDetails od ON o.OrderID = od.OrderID
-            WHERE YEAR(o.Date) = YEAR(GETDATE())
-            GROUP BY MONTH(o.Date)
-            ORDER BY Month;
-        """;
-        try (
-            PreparedStatement st = connection.prepareStatement(sql);
-            ResultSet rs = st.executeQuery()) {
-            while (rs.next()) {
-                int month = rs.getInt("Month");
-                double revenue = rs.getDouble("Revenue");
-                monthlySales.add(new MonthlySales(month, revenue));
-            }
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-        return monthlySales;
-    }
+//    //Retrieves monthly sales data for the current year
+//    public List<MonthlySales> getMonthlySales() {
+//        List<MonthlySales> monthlySales = new ArrayList<>();
+//        String sql = """
+//            SELECT 
+//                MONTH(o.Date) AS Month,
+//                SUM(od.Quantity * od.UnitPrice * (1 - COALESCE(od.Discount, 0))) AS Revenue
+//            FROM Orders o
+//            JOIN OrderDetails od ON o.OrderID = od.OrderID
+//            WHERE YEAR(o.Date) = YEAR(GETDATE())
+//            GROUP BY MONTH(o.Date)
+//            ORDER BY Month;
+//        """;
+//        try (
+//            PreparedStatement st = connection.prepareStatement(sql);
+//            ResultSet rs = st.executeQuery()) {
+//            while (rs.next()) {
+//                int month = rs.getInt("Month");
+//                double revenue = rs.getDouble("Revenue");
+//                monthlySales.add(new MonthlySales(month, revenue));
+//            }
+//        } catch (SQLException e) {
+//            System.out.println(e);
+//        }
+//        return monthlySales;
+//    }
     
     //Calculates revenue comparison between two months
     public Map<String, Object> compareMonthlyRevenue(int month1, int month2) {
@@ -126,7 +126,6 @@ public class ChartDAO extends DBContext{
         if (month1 < 1 || month1 > 12 || month2 < 1 || month2 > 12) {
             throw new IllegalArgumentException("Month values must be between 1 and 12");
         }
-        
         String sql = """
             SELECT 
                 MONTH(o.Date) AS Month,
@@ -143,7 +142,6 @@ public class ChartDAO extends DBContext{
             
             double revenue1 = 0;
             double revenue2 = 0;
-            
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     int month = rs.getInt("Month");
@@ -156,12 +154,10 @@ public class ChartDAO extends DBContext{
                     }
                 }
             }
-            
             double percentageChange = 0;
             if (revenue1 > 0) {
                 percentageChange = ((revenue2 - revenue1) / revenue1) * 100;
             }
-            
             result.put("month1", month1);
             result.put("month2", month2);
             result.put("revenue1", revenue1);
@@ -171,48 +167,6 @@ public class ChartDAO extends DBContext{
         } catch (SQLException e) {
             System.out.println(e);
         }
-        
         return result;
-    }
-    
-    public static void main(String[] args) {
-        ChartDAO dao = new ChartDAO();
-        
-        System.out.println("===== Best Selling Products =====");
-        List<BestSellingProduct> list = dao.getBestSellingProducts();
-        for (BestSellingProduct product : list) {
-            System.out.println(product.toString());
-        }
-        
-        // Test getTopSellingProducts
-        System.out.println("\n===== Top 3 Selling Products =====");
-        List<BestSellingProduct> topProducts = dao.getTopSellingProducts(3);
-        for (BestSellingProduct product : topProducts) {
-            System.out.println(product.toString());
-        }
-        
-        // Test getSalesByCategory
-        System.out.println("\n===== Sales by Category =====");
-        List<CategorySales> categories = dao.getSalesByCategory();
-        for (CategorySales category : categories) {
-            System.out.println(category.toString());
-        }
-        
-        // Test getMonthlySales
-        System.out.println("\n===== Monthly Sales =====");
-        List<MonthlySales> monthlySales = dao.getMonthlySales();
-        for (MonthlySales monthly : monthlySales) {
-            System.out.println(monthly.toString());
-        }
-        
-        // Test compareMonthlyRevenue
-        System.out.println("\n===== Revenue Comparison (Month 1 vs Month 2) =====");
-        Map<String, Object> comparison = dao.compareMonthlyRevenue(1, 2);
-        System.out.println("Month 1 Revenue: " + comparison.get("revenue1"));
-        System.out.println("Month 2 Revenue: " + comparison.get("revenue2"));
-        System.out.println("Percentage Change: " + comparison.get("percentageChange") + "%");
-    }
-    public Connection getConnection() {
-        return connection;
     }
 }
