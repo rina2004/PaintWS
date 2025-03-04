@@ -47,7 +47,7 @@
                         <!-- Left elements -->
                         <div class="col-lg-2 col-sm-4 col-4">
                             <a target="_blank" class="float-start">
-                                <img src="https://images.vexels.com/content/136540/preview/paint-shop-logo-c3433e.png" height="100" />
+                                <img src="https://images.vexels.com/content/136540/preview/paint-shop-logo-c3433e.png" height="100" alt="Paint Shop Logo"/>
                             </a>
                         </div>
                         <!-- Left elements -->
@@ -268,7 +268,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-6 d-flex">
                             <div class="card w-100 my-2 shadow-2-strong text-center">
                                 <!-- Display product image -->
-                                <img src="${product.image}" class="card-img-top" style="aspect-ratio: 1 / 1" alt="Product Image" />
+                                <img src="${product.image}" class="card-img-top" style="aspect-ratio: 1 / 1" alt="Product" />
                                 <div class="card-body d-flex flex-column align-items-center">
                                     <!-- Display product name -->
                                     <h5 class="card-title">

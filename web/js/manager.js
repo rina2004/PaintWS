@@ -3,7 +3,7 @@ $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip();
 
     // Select/Deselect checkboxes
-    var checkbox = $('table tbody input[type="checkbox"]');
+    let checkbox = $('table tbody input[type="checkbox"]');
     $("#selectAll").click(function () {
         if (this.checked) {
             checkbox.each(function () {
