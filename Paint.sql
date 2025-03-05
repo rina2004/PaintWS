@@ -1,5 +1,4 @@
-﻿
-CREATE DATABASE Paint_Store;
+﻿CREATE DATABASE Paint_Store;
 USE Paint_Store;
 
 -- Tạo bảng Users
@@ -22,9 +21,6 @@ VALUES
 ('emma_watson', 'password321', 2, 'emma@example.com', '321 Maple Rd, City D', '0223344556'),
 ('michael_brown', 'password654', 1, 'michael@example.com', '654 Elm Dr, City E', '0334455667');
 
-
-
-
 -- Tạo bảng Categories
 CREATE TABLE Categories (
     CategoryID INT IDENTITY(1,1) NOT NULL,
@@ -40,8 +36,6 @@ VALUES
 (N'Sơn Ngoại Thất', N'Sơn dành cho không gian ngoại thất, có khả năng chống chịu thời tiết khắc nghiệt.'),
 (N'Sơn Lót', N'Sơn lót giúp bề mặt tường mịn màng hơn, tạo lớp nền hoàn hảo trước khi sơn phủ.'),
 (N'Sơn Chống Thấm', N'Sơn chống thấm giúp bảo vệ bề mặt khỏi nước và độ ẩm, tăng độ bền cho công trình.');
-
-
 
 -- Tạo bảng Suppliers
 CREATE TABLE Suppliers (
@@ -62,7 +56,6 @@ VALUES
 (N'Công ty TNHH Nippon Paint', N'Hiroshi Tanaka', N'Nhật Bản', N'+81312345678'),
 (N'Sherwin-Williams Company', N'Alice Johnson', N'USA', N'+12123456789'),
 (N'Công ty TNHH Sơn Jotun', N'Lê Minh C', N'Na Uy', N'0987654321');
-
 
 -- Tạo bảng Paints
 CREATE TABLE Paints (
@@ -105,7 +98,6 @@ VALUES
 (N'Sơn Lót Chống Kiềm Ngoại Thất Đặc Biệt X8', 5, 2, 18.00, N'Vàng', 2814000, 150, 90, 5, 0, 'https://product.hstatic.net/1000403408/product/18l_moi_jotun_x8_cfe10279d6c54e29bd6e2f70d9ab0a19_master.png', N'Sơn lót chống kiềm ngoại thất cao cấp được Color8 sản xuất với các tính năng nổi bật:Độ che phủ cao, độ bền màu cao, Chống kiềm hóa, rêu mốc.', '2023-05-15', 0.05, 1),
 (N'Sơn Mịn Nội Thất Nano Cao Cấp K300', 2, 1, 18.00, N'Xanh', 2231000, 100, 70, 5, 0, 'https://product.hstatic.net/1000403408/product/son_bong_mo_18l_mocup_b0baa588ad1242499a2bdbdf7f3fca46_master.png', N'Sơn nội thất lau chùi hiệu quả là loại sơn nội thất cao cấp, giải pháp giúp tường nhà bạn luôn tươi mới, sạch sáng nhờ công nghệ tiên tiến ngăn vết bẩn thấm sâu vào màng sơn khiến chúng dễ dàng bị đánh bật chỉ với chiếc khăn ướt hoặc xà phòng mà không hề làm tổn hại màng sơn.', '2023-05-15', 0.05, 1);
 
-
 -- Tạo bảng Orders
 CREATE TABLE Orders (
     OrderID INT IDENTITY(1,1) NOT NULL,
@@ -128,7 +120,6 @@ VALUES
 ('2024-01-30', 4, 4400000, 1),  -- Đơn hàng của người dùng có UserID = 4
 ('2024-02-02', 2, 2845000, 0),  -- Đơn hàng thứ 2 của người dùng có UserID = 2
 ('2024-02-05', 5, 6000000, 1);  -- Đơn hàng của người dùng có UserID = 5
-
 
 -- Tạo bảng OrderDetails
 CREATE TABLE OrderDetails (
@@ -154,6 +145,3 @@ VALUES
 (4, 5, 2, 4400000, 0.0),  -- 2 sản phẩm Sơn Chống Thấm Pha Xi Măng với đơn hàng ID = 4
 (5, 6, 1, 2845000, 0.1),  -- 1 sản phẩm Sơn Lót Kháng Kiềm với đơn hàng ID = 5
 (6, 1, 4, 6000000, 0.0);  -- 4 sản phẩm Sơn Nội Thất Bóng Cao Cấp với đơn hàng ID = 6
-
-
-

@@ -3,12 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package dal;
-
 import context.DBContext;
 import java.sql.*;
 import java.util.*;
 import model.*;
-
 /**
  *
  * @author lytu
@@ -135,7 +133,6 @@ public class ChartDAO extends DBContext{
             WHERE MONTH(o.Date) IN (?, ?) AND YEAR(o.Date) = YEAR(GETDATE())
             GROUP BY MONTH(o.Date);
         """;
-        
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, month1);
             st.setInt(2, month2);

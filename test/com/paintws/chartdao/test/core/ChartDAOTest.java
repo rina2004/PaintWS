@@ -7,13 +7,11 @@ import java.util.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-
 /**
  *
  * @author A A
  */
 public class ChartDAOTest {
-        
     private static ChartDAO chartDAO;
 
     @Before
@@ -26,14 +24,12 @@ public class ChartDAOTest {
         chartDAO = null;
     }
     // ''-----------------------getBestSellingProducts()-----------------------------------''
-    
     @Test
     public void testGetBestSellingProducts_ReturnsNonEmptyList() {
         // Skip if integration tests cannot be run
         List<BestSellingProduct> result = chartDAO.getBestSellingProducts();
         assertNotNull("Result should not be null", result);
         assertFalse("Result should not be empty", result.isEmpty());
-        
     }
     
     @Test
@@ -44,8 +40,6 @@ public class ChartDAOTest {
         for (BestSellingProduct product : result) {
             assertNotNull("Product name should not be null", product.getProductName());
             assertFalse("Product name should not be empty", product.getProductName().isEmpty());
-
-            // Quantity sold should be non-negative
             assertTrue("Quantity sold should be non-negative", product.getTotalQuantitySold() >= 0);
         }
     }
@@ -60,7 +54,6 @@ public class ChartDAOTest {
         for (int i = 0; i < result.size() - 1; i++) {
             int currentQuantity = result.get(i).getTotalQuantitySold();
             int nextQuantity = result.get(i + 1).getTotalQuantitySold();
-
             assertTrue("Products should be ordered by quantity sold in descending order",
                 currentQuantity >= nextQuantity);
         }
@@ -105,15 +98,12 @@ public class ChartDAOTest {
     public void testGetTopSellingProducts_ReturnsOrderedList() {
         int limit = 10;
         List<BestSellingProduct> result = chartDAO.getTopSellingProducts(limit);
-
         if (result.size() < 2) return;
-        // Check descending order
         for (int i = 0; i < result.size() - 1; i++) {
             int currentQuantity = result.get(i).getTotalQuantitySold();
             int nextQuantity = result.get(i + 1).getTotalQuantitySold();
 
-            assertTrue("Products should be ordered by quantity sold in descending order",
-                    currentQuantity >= nextQuantity);
+            assertTrue("Products should be ordered by quantity sold in descending order", currentQuantity >= nextQuantity);
         }
     }
     
@@ -177,11 +167,8 @@ public class ChartDAOTest {
         for (CategorySales category : result) {
             assertNotNull("Category name should not be null", category.getCategoryName());
             assertFalse("Category name should not be empty", category.getCategoryName().isEmpty());
-
-            // Total sold should be non-negative
             assertTrue("Total quantity sold should be non-negative", category.getTotalSold() >= 0);
         }
-        
     }
     
     @Test
@@ -193,9 +180,7 @@ public class ChartDAOTest {
         for (int i = 0; i < result.size() - 1; i++) {
             int currentTotal = result.get(i).getTotalSold();
             int nextTotal = result.get(i + 1).getTotalSold();
-
-            assertTrue("Categories should be ordered by total sold in descending order",
-                    currentTotal >= nextTotal);
+            assertTrue("Categories should be ordered by total sold in descending order", currentTotal >= nextTotal);
         }
     }
     
@@ -213,7 +198,6 @@ public class ChartDAOTest {
                                       foundCategoryNames.contains("Sơn Ngoại Thất") ||
                                       foundCategoryNames.contains("Sơn Lót") ||
                                       foundCategoryNames.contains("Sơn Chống Thấm");
-
         assertTrue("Result should contain at least one of the expected categories", hasExpectedCategories);
     }
     
@@ -254,7 +238,6 @@ public class ChartDAOTest {
     @Test
     public void testCompareMonthlyRevenue_DataTypesAreCorrect() {
         Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2);
-
         assertTrue("month1 should be an Integer", result.get("month1") instanceof Integer);
         assertTrue("month2 should be an Integer", result.get("month2") instanceof Integer);
         assertTrue("revenue1 should be a Number", result.get("revenue1") instanceof Number);
@@ -272,7 +255,6 @@ public class ChartDAOTest {
     public void testCompareMonthlyRevenue_CalculatesPercentageChangeCorrectly() {
         int month1 = 1;
         int month2 = 2;
-
         Map<String, Object> result = chartDAO.compareMonthlyRevenue(month1, month2);
 
         double revenue1 = ((Number)result.get("revenue1")).doubleValue();
