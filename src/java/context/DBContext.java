@@ -6,25 +6,21 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 /**
  *
- * @author lytu
+ * @author FPT University - PRJ30X
  */
 public class DBContext {
+
     protected Connection connection;
-    public DBContext(){
+
+    public DBContext() {
         try {
-            String user = "sa";
-            String pass = "12345";
+            String user = "rina";
+            String pass = "26122004";
             String url = "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;databaseName=Paint_Store";
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(url, user, pass);
-        } catch (ClassNotFoundException | SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

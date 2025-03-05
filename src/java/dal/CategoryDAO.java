@@ -4,7 +4,6 @@ package dal;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 import context.DBContext;
 import java.lang.System.Logger.Level;
 import java.sql.PreparedStatement;
@@ -45,7 +44,8 @@ public class CategoryDAO extends DBContext {
     }
 
     public Category getCategoryById(int id) {
-        String sql = "SELECT * FROM [dbo].[Categories] WHERE CategoryID = ?";
+        String sql = "SELECT CategoryID, CategoryName, Description FROM [dbo].[Categories] WHERE CategoryID = ?";
+
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, id);
@@ -63,12 +63,46 @@ public class CategoryDAO extends DBContext {
         return null;
     }
     
-     public static void main(String[] args) {
-        CategoryDAO dao = new CategoryDAO();
-        List<Category> list = dao.getAll();
-         for (Category o : list) {
-             System.out.println(o); 
-         }
+    public void create(Category c) {
+        String sql = "INSERT INTO [dbo].[Categories] (CategoryName, Description) VALUES (?, ?)";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, c.getName());
+            st.setString(2, c.getDescribe());
+
+            st.executeUpdate();
+        } catch (SQLException e) {
+            Logger.getLogger(CategoryDAO.class.getName()).log(java.util.logging.Level.SEVERE, null, e);
+        }
     }
 
+    public void update(Category c) {
+        String sql = "UPDATE [dbo].[Categories] SET CategoryName = ?, Description = ? WHERE CategoryID = ?";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, c.getName());
+            st.setString(2, c.getDescribe());
+            st.setInt(3, c.getId());
+
+            st.executeUpdate();
+        } catch (SQLException e) {
+            Logger.getLogger(CategoryDAO.class.getName()).log(java.util.logging.Level.SEVERE, null, e);
+        }
+    }
+
+    
+    public void delete(Category c) {
+        String sql = "DELETE FROM [dbo].[Categories] WHERE CategoryID = ?";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, c.getId());
+
+            st.executeUpdate();
+        } catch (SQLException e) {
+            Logger.getLogger(CategoryDAO.class.getName()).log(java.util.logging.Level.SEVERE, null, e);
+        }
+    }
 }
