@@ -272,15 +272,17 @@ public class ProductDAO extends DBContext {
     }
 
     public int deleteProduct(String pid) {
+        if (pid == null || pid.trim().isEmpty()) {
+            return 0; // Trả về 0 nếu pid rỗng hoặc null
+        }
+
         String sql = "DELETE FROM [dbo].[Paints] WHERE ProductID = ?";
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
-            st.setString(1, pid); // Gán giá trị 'pid' cho tham số ProductID trong câu truy vấn
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setString(1, pid);
             return st.executeUpdate(); // Trả về số dòng bị ảnh hưởng
         } catch (SQLException e) {
-            System.out.println("Error during deletion: " + e.getMessage());
+            return 0; // Nếu có lỗi, trả về 0 thay vì ném exception
         }
-        return 0; // Trả về 0 nếu không xóa được sản phẩm nào
     }
 
     public void insertProduct(String name, String image, String price, String stock,
@@ -319,7 +321,7 @@ public class ProductDAO extends DBContext {
     }
 
 // Phương thức kiểm tra xem sản phẩm đã tồn tại hay chưa
-    private boolean productExists(String name) {
+    public boolean productExists(String name) {
         String sql = "SELECT COUNT(*) FROM Paints WHERE ProductName = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, name);
@@ -416,5 +418,8 @@ public class ProductDAO extends DBContext {
             System.out.println(e);
         }
     }
+    
+    
+    
 
 }
