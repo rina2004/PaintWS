@@ -316,7 +316,9 @@ public class ProductDAO extends DBContext {
             // Thực hiện câu lệnh SQL và trả về số dòng bị ảnh hưởng
             st.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (SQLException e) { // Hoặc log lỗi
+            // Hoặc log lỗi
+            throw new RuntimeException("Database error occurred!", e);
         }
     }
 
@@ -330,6 +332,7 @@ public class ProductDAO extends DBContext {
                 return rs.getInt(1) > 0; // Nếu có sản phẩm, trả về true
             }
         } catch (SQLException e) {
+            throw new RuntimeException("Database error occurred!", e);
         }
         return false; // Nếu không có sản phẩm, trả về false
     }
@@ -418,8 +421,5 @@ public class ProductDAO extends DBContext {
             System.out.println(e);
         }
     }
-    
-    
-    
 
 }

@@ -95,7 +95,7 @@ public class ProductDAOTest {
 //        assertEquals(0, products.size()); // Kiểm tra danh sách rỗng
 //    }
 
-//    //Test delete product
+    //Test delete product
 //    @Test
 //    public void testDeleteProduct_Success() throws Exception {
 //        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
@@ -125,16 +125,10 @@ public class ProductDAOTest {
 //        int result = productDAO.deleteProduct(null); // Không gọi DB vì `pid` null
 //        assertEquals(0, result);
 //    }
-//
-//    @Test
-//    public void testDeleteProduct_SQLFailure() throws Exception { //Lỗi SQL 
-//        when(mockConnection.prepareStatement(anyString())).thenThrow(new RuntimeException("Database error"));
-//
-//        int result = productDAO.deleteProduct("P002"); // Vì đã bắt lỗi trong DAO, kết quả vẫn là 0
-//        assertEquals(0, result);
-//    }
-//
-//    //Test update product status
+
+    
+
+    //Test update product status
 //    @Test
 //    public void testUpdateProductStatus_Success_True() throws Exception {
 //        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
@@ -189,6 +183,8 @@ public class ProductDAOTest {
 //        verify(mockPreparedStatement).setString(2, null);
 //        verify(mockPreparedStatement).executeUpdate();
 //    }
+    
+    
     @Test
     public void testInsertProduct_ValidData() throws Exception {
         when(productDAO.productExists("Paint A")).thenReturn(false);
@@ -219,6 +215,20 @@ public class ProductDAOTest {
         productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
 
         verify(mockPreparedStatement, never()).executeUpdate(); // Không được gọi `executeUpdate()`
+    }
+    
+    @Test
+    public void testInsertProduct_InvalidData() throws Exception {
+        when(productDAO.productExists("")).thenReturn(false);
+        when(productDAO.productExists(null)).thenReturn(false);
+
+        // Trường hợp name = ""
+        productDAO.insertProduct("", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+
+        // Trường hợp name = null
+        productDAO.insertProduct(null, "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
     }
 
 }
