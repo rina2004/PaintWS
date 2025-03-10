@@ -411,9 +411,13 @@ public class ProductDAO extends DBContext {
     }
 
     public void updateProductStatus(String productName, boolean status) {
-        try {
-            String sql = "UPDATE [dbo].[Paints] SET [Status] = ? WHERE [ProductName] = ?";
-            PreparedStatement st = connection.prepareStatement(sql);
+        if (productName == null || productName.trim().isEmpty()) {
+            System.out.println("Invalid product name");
+            return; // Không thực hiện truy vấn SQL nếu productName không hợp lệ
+        }
+
+        String sql = "UPDATE [dbo].[Paints] SET [Status] = ? WHERE [ProductName] = ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setBoolean(1, status);
             st.setString(2, productName);
             st.executeUpdate();
