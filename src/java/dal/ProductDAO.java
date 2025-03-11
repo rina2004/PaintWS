@@ -26,6 +26,11 @@ public class ProductDAO extends DBContext {
     private static final String CATEGORY_ID = "CategoryID";
     private static final String SUPPLIER_ID = "SupplerID";
 
+    public ProductDAO() {
+        this.cd = new CategoryDAO();
+        this.sd = new SupplierDAO();
+    }
+
     public List<Product> getAll() {
         List<Product> list = new ArrayList<>();
         String sql = "SELECT * FROM [dbo].[Paints]";
@@ -281,7 +286,7 @@ public class ProductDAO extends DBContext {
             st.setString(1, pid);
             return st.executeUpdate(); // Trả về số dòng bị ảnh hưởng
         } catch (SQLException e) {
-            return 0; 
+            return 0;
         }
     }
 
@@ -289,6 +294,19 @@ public class ProductDAO extends DBContext {
             String sold, String volume, String color, String supplier,
             String description, String category, String discontinued, String status) {
 
+        // Kiểm tra tham số đầu vào
+        if (name == null || name.trim().isEmpty()
+                || price == null || price.trim().isEmpty()
+                || stock == null || stock.trim().isEmpty()
+                || sold == null || sold.trim().isEmpty()
+                || volume == null || volume.trim().isEmpty()
+                || supplier == null || supplier.trim().isEmpty()
+                || category == null || category.trim().isEmpty()
+                || discontinued == null || discontinued.trim().isEmpty()
+                || status == null || status.trim().isEmpty()) {
+
+            return;
+        }
         // Kiểm tra xem sản phẩm đã tồn tại
         if (productExists(name)) {
             return;
@@ -412,7 +430,7 @@ public class ProductDAO extends DBContext {
 
     public void updateProductStatus(String productName, boolean status) {
         if (productName == null || productName.trim().isEmpty()) {
-            return; 
+            return;
         }
 
         String sql = "UPDATE [dbo].[Paints] SET [Status] = ? WHERE [ProductName] = ?";

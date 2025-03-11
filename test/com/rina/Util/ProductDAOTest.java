@@ -136,6 +136,8 @@ public class ProductDAOTest {
         verify(mockPreparedStatement).setBoolean(1, true);
         verify(mockPreparedStatement).setString(2, "Paint A");
         verify(mockPreparedStatement).executeUpdate();
+        
+         
     }
 
     @Test
@@ -147,6 +149,8 @@ public class ProductDAOTest {
         verify(mockPreparedStatement).setBoolean(1, false);
         verify(mockPreparedStatement).setString(2, "Paint A");
         verify(mockPreparedStatement).executeUpdate();
+        
+       
     }
 
     @Test
@@ -158,6 +162,8 @@ public class ProductDAOTest {
         verify(mockPreparedStatement).setBoolean(1, true);
         verify(mockPreparedStatement).setString(2, "Paint B");
         verify(mockPreparedStatement).executeUpdate();
+        
+        assertEquals(0, mockPreparedStatement.executeUpdate());
     }
 
     @Test
@@ -171,9 +177,8 @@ public class ProductDAOTest {
         productDAO.updateProductStatus(null, false);
         verify(mockPreparedStatement, never()).executeUpdate(); // Không gọi SQL
     }
-    
-    
 
+    //Test insert product
     @Test
     public void testInsertProduct_ValidData() throws Exception {
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
@@ -181,10 +186,10 @@ public class ProductDAOTest {
 
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
-        
         productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
 
         verify(mockPreparedStatement).executeUpdate();
+        
     }
 
     @Test
@@ -193,10 +198,21 @@ public class ProductDAOTest {
         when(mockResultSet.next()).thenReturn(true); // Sản phẩm đã tồn tại
         when(mockResultSet.getInt(1)).thenReturn(1); // COUNT(*) trả về số lượng sản phẩm
 
-        
         productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
 
         // Đảm bảo rằng không gọi `executeUpdate()`
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_EmptyValues() throws Exception {
+        productDAO.insertProduct("", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+    
+     @Test
+    public void testInsertProduct_NullValues() throws Exception {
+        productDAO.insertProduct(null, "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
         verify(mockPreparedStatement, never()).executeUpdate();
     }
 
