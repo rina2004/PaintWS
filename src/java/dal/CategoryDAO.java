@@ -58,21 +58,20 @@ public class CategoryDAO extends DBContext {
                 );
             }
         } catch (SQLException e) {
-            System.out.println(e);
+            Logger.getLogger(CategoryDAO.class.getName()).log(java.util.logging.Level.SEVERE, null, e);
         }
         return null;
     }
-    
+
     public void create(Category c) {
         String sql = "INSERT INTO [dbo].[Categories] (CategoryName, Description) VALUES (?, ?)";
-
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, c.getName());
             st.setString(2, c.getDescribe());
-
             st.executeUpdate();
         } catch (SQLException e) {
+            System.out.println("Create category fail. Check the connection and try again!");
             Logger.getLogger(CategoryDAO.class.getName()).log(java.util.logging.Level.SEVERE, null, e);
         }
     }
@@ -80,28 +79,26 @@ public class CategoryDAO extends DBContext {
     public void update(Category c) {
         String sql = "UPDATE [dbo].[Categories] SET CategoryName = ?, Description = ? WHERE CategoryID = ?";
 
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setString(1, c.getName());
             st.setString(2, c.getDescribe());
             st.setInt(3, c.getId());
-
             st.executeUpdate();
         } catch (SQLException e) {
+            System.out.println("Update category failed. Check the connection and try again!");
             Logger.getLogger(CategoryDAO.class.getName()).log(java.util.logging.Level.SEVERE, null, e);
         }
     }
 
-    
     public void delete(Category c) {
         String sql = "DELETE FROM [dbo].[Categories] WHERE CategoryID = ?";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, c.getId());
-
             st.executeUpdate();
         } catch (SQLException e) {
+            System.out.println("Delete category failed. Check the connection and try again!");
             Logger.getLogger(CategoryDAO.class.getName()).log(java.util.logging.Level.SEVERE, null, e);
         }
     }

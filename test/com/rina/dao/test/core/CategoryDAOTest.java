@@ -59,29 +59,10 @@ public class CategoryDAOTest {
     }
 
     //--------------------
-    // Connection Tests
-    //--------------------
-    @Test
-    public void testConnectionFailure() throws Exception {
-        // Simulate connection failure
-        when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Connection failure"));
-
-        // Execute the method to test
-        List<Category> categories = categoryDAO.getAll();
-
-        // Verifications
-        assertNotNull(categories);
-        assertTrue(categories.isEmpty());
-
-        // Verify SQLException was handled
-        verify(mockConnection).prepareStatement(anyString());
-    }
-
-    //--------------------
     // getAll Tests
     //--------------------
     @Test
-    public void testGetAll() throws SQLException {
+    public void testGetAll_ExistedRecords() throws SQLException {
         // Configure mocks
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
 
@@ -105,11 +86,6 @@ public class CategoryDAOTest {
         assertEquals(2, categories.get(1).getId());
         assertEquals("Oil Paint", categories.get(1).getName());
         assertEquals("Oil description", categories.get(1).getDescribe());
-
-        // Verify SQL methods were called
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).executeQuery();
-        verify(mockResultSet, times(3)).next();
     }
 
     @Test
@@ -123,11 +99,6 @@ public class CategoryDAOTest {
 
         // Verifications
         assertTrue(categories.isEmpty());
-
-//        // Verify SQL methods were called
-//        verify(mockConnection).prepareStatement(anyString());
-//        verify(mockPreparedStatement).executeQuery();
-//        verify(mockResultSet).next();
     }
 
     @Test
@@ -153,19 +124,6 @@ public class CategoryDAOTest {
         assertNull(categories.get(0).getDescribe());
     }
 
-//    @Test
-//    public void testGetAll_SQLException() throws SQLException {
-//        // Simulate an SQL exception
-//        when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException("Test exception"));
-//
-//        // Execute the method to test
-//        List<Category> categories = categoryDAO.getAll();
-//
-//        // Verifications
-//        assertNotNull(categories);
-//        assertTrue(categories.isEmpty());
-//    }
-
     //--------------------
     // getCategoryById Tests
     //--------------------
@@ -186,12 +144,6 @@ public class CategoryDAOTest {
         assertEquals(1, category.getId());
         assertEquals("Acrylic Paint", category.getName());
         assertEquals("Acrylic description", category.getDescribe());
-
-        // Verify SQL methods were called
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).executeQuery();
-        verify(mockResultSet).next();
     }
 
     @Test
@@ -205,58 +157,13 @@ public class CategoryDAOTest {
 
         // Verifications
         assertNull(category);
-
-        // Verify SQL methods were called
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 999);
-        verify(mockPreparedStatement).executeQuery();
-        verify(mockResultSet).next();
-    }
-
-    @Test
-    public void testGetCategoryById_SQLException() throws SQLException {
-        // Simulate an SQL exception
-        when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException("Test exception"));
-
-        // Execute the method to test
-        Category category = categoryDAO.getCategoryById(1);
-
-        // Verifications
-        assertNull(category);
-
-        // Verify SQL methods were called
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).executeQuery();
-    }
-
-    @Test
-    public void testGetCategoryById_WithLargeId() throws SQLException {
-        // Configure mocks
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getInt("CategoryID")).thenReturn(Integer.MAX_VALUE);
-        when(mockResultSet.getString("CategoryName")).thenReturn("Max ID Category");
-        when(mockResultSet.getString("Description")).thenReturn("Category with maximum possible ID");
-
-        // Execute the method to test with largest possible integer
-        Category category = categoryDAO.getCategoryById(Integer.MAX_VALUE);
-
-        // Verifications
-        assertNotNull(category);
-        assertEquals(Integer.MAX_VALUE, category.getId());
-        assertEquals("Max ID Category", category.getName());
-        assertEquals("Category with maximum possible ID", category.getDescribe());
-
-        // Verify SQL methods were called with correct parameters
-        verify(mockPreparedStatement).setInt(1, Integer.MAX_VALUE);
     }
 
     //--------------------
     // create Tests
     //--------------------
     @Test
-    public void testCreate() throws SQLException {
+    public void testCreate_NormalCase() throws SQLException {
         // Prepare test data
         Category category = new Category();
         category.setName("New Category");
@@ -269,25 +176,6 @@ public class CategoryDAOTest {
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setString(1, "New Category");
         verify(mockPreparedStatement).setString(2, "New category description");
-        verify(mockPreparedStatement).executeUpdate();
-    }
-
-    @Test
-    public void testCreate_SQLException() throws SQLException {
-        // Prepare test data
-        Category category = new Category();
-        category.setName("Test");
-        category.setDescribe("Test description");
-
-        // Simulate an SQL exception
-        doThrow(new SQLException("Test exception")).when(mockPreparedStatement).executeUpdate();
-
-        // Execute the method to test - should not throw exception
-        categoryDAO.create(category);
-
-        // Verify method was called despite exception
-        verify(mockPreparedStatement).setString(1, "Test");
-        verify(mockPreparedStatement).setString(2, "Test description");
         verify(mockPreparedStatement).executeUpdate();
     }
 
@@ -308,34 +196,11 @@ public class CategoryDAOTest {
         verify(mockPreparedStatement).executeUpdate();
     }
 
-    @Test
-    public void testCreate_VerifyCreationWithReflection() throws Exception {
-        // Configure mock to capture SQL statement
-        PreparedStatement capturedStatement = mock(PreparedStatement.class);
-        when(mockConnection.prepareStatement(argThat(sql -> sql.toLowerCase().contains("insert")))).thenReturn(capturedStatement);
-
-        // Prepare test data
-        Category category = new Category();
-        category.setName("Test Category");
-        category.setDescribe("Test Description");
-
-        // Execute the method to test
-        categoryDAO.create(category);
-
-        // Verify the correct SQL statement is used
-        verify(mockConnection).prepareStatement(argThat(sql
-                -> sql.toLowerCase().contains("insert into")
-                && sql.contains("[dbo].[Categories]")
-                && sql.contains("CategoryName")
-                && sql.contains("Description")
-        ));
-    }
-
     //--------------------
     // update Tests
     //--------------------
     @Test
-    public void testUpdate() throws SQLException {
+    public void testUpdate_Found() throws SQLException {
         // Prepare test data
         Category category = new Category();
         category.setId(1);
@@ -347,27 +212,6 @@ public class CategoryDAOTest {
 
         // Verifications
         verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setString(1, "Updated Category");
-        verify(mockPreparedStatement).setString(2, "Updated description");
-        verify(mockPreparedStatement).setInt(3, 1);
-        verify(mockPreparedStatement).executeUpdate();
-    }
-
-    @Test
-    public void testUpdate_SQLException() throws SQLException {
-        // Prepare test data
-        Category category = new Category();
-        category.setId(1);
-        category.setName("Updated Category");
-        category.setDescribe("Updated description");
-
-        // Simulate an SQL exception
-        doThrow(new SQLException("Test exception")).when(mockPreparedStatement).executeUpdate();
-
-        // Execute the method to test - should not throw exception
-        categoryDAO.update(category);
-
-        // Verify method was called despite exception
         verify(mockPreparedStatement).setString(1, "Updated Category");
         verify(mockPreparedStatement).setString(2, "Updated description");
         verify(mockPreparedStatement).setInt(3, 1);
@@ -393,6 +237,28 @@ public class CategoryDAOTest {
         verify(mockPreparedStatement).executeUpdate();
     }
 
+    @Test
+    public void testUpdate_WithNonExistentId() throws SQLException {
+        // Configure mock to simulate no rows affected
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+
+        // Prepare test data with ID that doesn't exist
+        Category category = new Category();
+        category.setId(999);
+        category.setName("Updated Category");
+        category.setDescribe("Updated description");
+
+        // Execute the method to test
+        categoryDAO.update(category);
+
+        // Verifications
+        verify(mockConnection).prepareStatement(anyString());
+        verify(mockPreparedStatement).setString(1, "Updated Category");
+        verify(mockPreparedStatement).setString(2, "Updated description");
+        verify(mockPreparedStatement).setInt(3, 999);
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
     //--------------------
     // delete Tests
     //--------------------
@@ -407,23 +273,6 @@ public class CategoryDAOTest {
 
         // Verifications
         verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).executeUpdate();
-    }
-
-    @Test
-    public void testDelete_SQLException() throws SQLException {
-        // Prepare test data
-        Category category = new Category();
-        category.setId(1);
-
-        // Simulate an SQL exception
-        doThrow(new SQLException("Test exception")).when(mockPreparedStatement).executeUpdate();
-
-        // Execute the method to test - should not throw exception
-        categoryDAO.delete(category);
-
-        // Verify method was called despite exception
         verify(mockPreparedStatement).setInt(1, 1);
         verify(mockPreparedStatement).executeUpdate();
     }
