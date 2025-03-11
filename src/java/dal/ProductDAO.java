@@ -281,7 +281,7 @@ public class ProductDAO extends DBContext {
             st.setString(1, pid);
             return st.executeUpdate(); // Trả về số dòng bị ảnh hưởng
         } catch (SQLException e) {
-            return 0; // Nếu có lỗi, trả về 0 thay vì ném exception
+            return 0; 
         }
     }
 
@@ -412,8 +412,7 @@ public class ProductDAO extends DBContext {
 
     public void updateProductStatus(String productName, boolean status) {
         if (productName == null || productName.trim().isEmpty()) {
-            System.out.println("Invalid product name");
-            return; // Không thực hiện truy vấn SQL nếu productName không hợp lệ
+            return; 
         }
 
         String sql = "UPDATE [dbo].[Paints] SET [Status] = ? WHERE [ProductName] = ?";

@@ -176,14 +176,12 @@ public class ProductDAOTest {
 
     @Test
     public void testInsertProduct_ValidData() throws Exception {
-        // Tạo mock ResultSet
-        ResultSet mockResultSet = mock(ResultSet.class);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false); // Sản phẩm chưa tồn tại
 
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
-        // Gọi phương thức thực của `productExists()` mà không cần `when().thenCallRealMethod()`
+        
         productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
 
         verify(mockPreparedStatement).executeUpdate();
@@ -191,13 +189,11 @@ public class ProductDAOTest {
 
     @Test
     public void testInsertProduct_AlreadyExists() throws Exception {
-        // Mock ResultSet
-        ResultSet mockResultSet = mock(ResultSet.class);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true); // Sản phẩm đã tồn tại
         when(mockResultSet.getInt(1)).thenReturn(1); // COUNT(*) trả về số lượng sản phẩm
 
-        // Gọi phương thức thực của `productExists()` mà không cần `when().thenCallRealMethod()`
+        
         productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
 
         // Đảm bảo rằng không gọi `executeUpdate()`
