@@ -78,23 +78,23 @@ public class SupplierDAOTest {
         when(connection.prepareStatement(sql)).thenReturn(stm);
         when(stm.executeQuery()).thenReturn(rs);
 
-        AtomicInteger count = new AtomicInteger(0);
-        when(rs.next()).thenAnswer(invocation -> count.getAndIncrement() < 2);
+        // Mô phỏng kết quả cho từng lần gọi rs.next()
+        when(rs.next()).thenReturn(true, true, false, false);
 
-       
+        // Mô phỏng dữ liệu cho 2 supplier hợp lệ
         when(rs.getInt("SupplierID")).thenReturn(1, 2);
         when(rs.getString("CompanyName")).thenReturn("FPT", "Google");
         when(rs.getString("ContactName")).thenReturn("KhanhNG", "JohnDoe");
         when(rs.getString("Country")).thenReturn("Japan", "USA");
         when(rs.getString("Phone")).thenReturn("0123456789", "0987654321");
 
-        
-        
+        // Gọi phương thức cần test
         Supplier sp1 = dao.getSupplierById(1);
         Supplier sp2 = dao.getSupplierById(2);
-        Supplier sp3 = dao.getSupplierById(999);
-        Supplier sp4 = dao.getSupplierById(-1);
-       
+        Supplier sp3 = dao.getSupplierById(999); // Không tồn tại
+        Supplier sp4 = dao.getSupplierById(-1);  // ID không hợp lệ
+
+        // Kiểm tra dữ liệu của Supplier 1
         assertNotNull(sp1);
         assertEquals(1, sp1.getId());
         assertEquals("FPT", sp1.getCompanyName());
@@ -102,7 +102,7 @@ public class SupplierDAOTest {
         assertEquals("Japan", sp1.getCountry());
         assertEquals("0123456789", sp1.getPhone());
 
-        
+        // Kiểm tra dữ liệu của Supplier 2
         assertNotNull(sp2);
         assertEquals(2, sp2.getId());
         assertEquals("Google", sp2.getCompanyName());
@@ -110,8 +110,9 @@ public class SupplierDAOTest {
         assertEquals("USA", sp2.getCountry());
         assertEquals("0987654321", sp2.getPhone());
 
-        assertNull(sp3);
-        assertNull(sp4);
+        
+        assertNull(sp3); 
+        assertNull(sp4); 
     }
 
 }
