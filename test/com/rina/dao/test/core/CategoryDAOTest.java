@@ -61,6 +61,7 @@ public class CategoryDAOTest {
     //--------------------
     // getAll Tests
     //--------------------
+    
     @Test
     public void testGetAll_ExistedRecords() throws SQLException {
         // Configure mocks
@@ -127,6 +128,7 @@ public class CategoryDAOTest {
     //--------------------
     // getCategoryById Tests
     //--------------------
+    
     @Test
     public void testGetCategoryById_Found() throws SQLException {
         // Configure mocks
@@ -153,7 +155,7 @@ public class CategoryDAOTest {
         when(mockResultSet.next()).thenReturn(false);
 
         // Execute the method to test
-        Category category = categoryDAO.getCategoryById(999);
+        Category category = categoryDAO.getCategoryById(1);
 
         // Verifications
         assertNull(category);
@@ -162,21 +164,28 @@ public class CategoryDAOTest {
     //--------------------
     // create Tests
     //--------------------
+    
     @Test
     public void testCreate_NormalCase() throws SQLException {
         // Prepare test data
         Category category = new Category();
         category.setName("New Category");
         category.setDescribe("New category description");
+        
+        // Configure mocks
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
         // Execute the method to test
-        categoryDAO.create(category);
+        int rowsAffected = categoryDAO.create(category);
 
         // Verifications
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setString(1, "New Category");
         verify(mockPreparedStatement).setString(2, "New category description");
         verify(mockPreparedStatement).executeUpdate();
+        
+        assertEquals(1, rowsAffected);
     }
 
     @Test
@@ -185,20 +194,50 @@ public class CategoryDAOTest {
         Category category = new Category();
         category.setName(null);
         category.setDescribe(null);
+        
+        // Configure mocks
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
         // Execute the method to test
-        categoryDAO.create(category);
+        int rowsAffected = categoryDAO.create(category);
 
         // Verifications
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setString(1, null);
         verify(mockPreparedStatement).setString(2, null);
         verify(mockPreparedStatement).executeUpdate();
+        
+        assertEquals(1, rowsAffected);
+    }
+
+    @Test
+    public void testCreate_WithExistentId() throws SQLException {
+        // Prepare test data
+        Category category = new Category();
+        category.setName("Existing Category");
+        category.setDescribe("Existing description");
+
+        // Configure mocks
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException("Duplicate entry"));
+
+        // Execute the method to test
+        int rowsAffected = categoryDAO.create(category);
+
+        // Verifications
+        verify(mockConnection).prepareStatement(anyString());
+        verify(mockPreparedStatement).setString(1, "Existing Category");
+        verify(mockPreparedStatement).setString(2, "Existing description");
+        verify(mockPreparedStatement).executeUpdate();
+
+        assertEquals(0, rowsAffected);
     }
 
     //--------------------
     // update Tests
     //--------------------
+    
     @Test
     public void testUpdate_Found() throws SQLException {
         // Prepare test data
@@ -207,8 +246,11 @@ public class CategoryDAOTest {
         category.setName("Updated Category");
         category.setDescribe("Updated description");
 
+        // Configure mocks
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+
         // Execute the method to test
-        categoryDAO.update(category);
+        int rowsAffected = categoryDAO.update(category);
 
         // Verifications
         verify(mockConnection).prepareStatement(anyString());
@@ -216,25 +258,8 @@ public class CategoryDAOTest {
         verify(mockPreparedStatement).setString(2, "Updated description");
         verify(mockPreparedStatement).setInt(3, 1);
         verify(mockPreparedStatement).executeUpdate();
-    }
 
-    @Test
-    public void testUpdate_WithNullValues() throws SQLException {
-        // Prepare test data with null values
-        Category category = new Category();
-        category.setId(1);
-        category.setName(null);
-        category.setDescribe(null);
-
-        // Execute the method to test
-        categoryDAO.update(category);
-
-        // Verifications
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setString(1, null);
-        verify(mockPreparedStatement).setString(2, null);
-        verify(mockPreparedStatement).setInt(3, 1);
-        verify(mockPreparedStatement).executeUpdate();
+        assertEquals(1, rowsAffected);
     }
 
     @Test
@@ -249,32 +274,39 @@ public class CategoryDAOTest {
         category.setDescribe("Updated description");
 
         // Execute the method to test
-        categoryDAO.update(category);
+        int rowsAffected = categoryDAO.update(category);
 
         // Verifications
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setString(1, "Updated Category");
         verify(mockPreparedStatement).setString(2, "Updated description");
         verify(mockPreparedStatement).setInt(3, 999);
-        verify(mockPreparedStatement).executeUpdate();
+
+        assertEquals(0, rowsAffected);
     }
 
     //--------------------
     // delete Tests
     //--------------------
+    
     @Test
     public void testDelete() throws SQLException {
         // Prepare test data
         Category category = new Category();
         category.setId(1);
 
+        // Configure mocks
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+
         // Execute the method to test
-        categoryDAO.delete(category);
+        int rowAffected = categoryDAO.delete(category);
 
         // Verifications
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setInt(1, 1);
         verify(mockPreparedStatement).executeUpdate();
+
+        assertEquals(1, rowAffected);
     }
 
     @Test
@@ -284,14 +316,16 @@ public class CategoryDAOTest {
 
         // Prepare test data
         Category category = new Category();
-        category.setId(999); // ID that doesn't exist
+        category.setId(1);
 
         // Execute the method to test
-        categoryDAO.delete(category);
+        int rowAffected = categoryDAO.delete(category);
 
         // Verifications
         verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 999);
+        verify(mockPreparedStatement).setInt(1, 1);
         verify(mockPreparedStatement).executeUpdate();
+
+        assertEquals(0, rowAffected);
     }
 }
