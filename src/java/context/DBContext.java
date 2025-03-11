@@ -16,12 +16,22 @@ public class DBContext {
 
     public DBContext() {
         try {
-            String user = "rina";
-            String pass = "26122004";
+            String user = "sa";
+            String pass = "123";
             String url = "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;databaseName=Paint_Store";
             connection = DriverManager.getConnection(url, user, pass);
         } catch (SQLException ex) {
             Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    public static void main(String[] args) {
+        DBContext db = new DBContext();
+        Connection conn = db.connection;
+
+        if (conn != null) {
+            System.out.println("Kết nối database thành công!");
+        } else {
+            System.out.println("Kết nối database thất bại!");
         }
     }
 }
