@@ -2,10 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.paintws.chartdao.test.core;
+package dal;
 
 import context.DBContext;
-import dal.ChartDAO;
 import model.*;
 import java.sql.*;
 import java.util.*;

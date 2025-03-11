@@ -2,10 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit4TestClass.java to edit this template
  */
-package com.rina.dao.test.core;
+package dal;
 
 import context.DBContext;
-import dal.CategoryDAO;
 import model.Category;
 import org.junit.Before;
 import org.junit.Test;

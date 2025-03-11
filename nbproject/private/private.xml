@@ -2,13 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/D:/New%20folder/New%20folder/PaintWS/src/java/dal/ChartDAO.java</file>
-            <file>file:/D:/New%20folder/New%20folder/PaintWS/src/java/model/BestSellingProduct.java</file>
-            <file>file:/D:/New%20folder/New%20folder/PaintWS/test/com/rina/dao/test/core/CategoryDAOTest.java</file>
-            <file>file:/D:/New%20folder/New%20folder/PaintWS/src/java/model/Product.java</file>
-            <file>file:/D:/New%20folder/New%20folder/PaintWS/test/com/paintws/chartdao/test/core/ChartDAOTest.java</file>
-            <file>file:/D:/New%20folder/New%20folder/PaintWS/src/java/model/CategorySales.java</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>
