@@ -3,8 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/Code/JavaWeb/PaintWS/test/com/rina/dao/test/core/CategoryDAOTest.java</file>
-            <file>file:/E:/Code/JavaWeb/PaintWS/src/java/dal/CategoryDAO.java</file>
+            <file>file:/D:/New%20folder/New%20folder/PaintWS/src/java/dal/ChartDAO.java</file>
+            <file>file:/D:/New%20folder/New%20folder/PaintWS/src/java/model/BestSellingProduct.java</file>
+            <file>file:/D:/New%20folder/New%20folder/PaintWS/test/com/rina/dao/test/core/CategoryDAOTest.java</file>
+            <file>file:/D:/New%20folder/New%20folder/PaintWS/src/java/model/Product.java</file>
+            <file>file:/D:/New%20folder/New%20folder/PaintWS/test/com/paintws/chartdao/test/core/ChartDAOTest.java</file>
+            <file>file:/D:/New%20folder/New%20folder/PaintWS/src/java/model/CategorySales.java</file>
         </group>
     </open-files>
 </project-private>
