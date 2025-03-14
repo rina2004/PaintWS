@@ -36,10 +36,10 @@ public class OrderDAOTest {
     public void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
         orderDAO = new OrderDAO();
-        orderDAO.connection = mockConnection; 
+        orderDAO.connection = mockConnection;
 
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1); 
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
     }
 
@@ -48,13 +48,14 @@ public class OrderDAOTest {
         User mockUser = new User("TestUser", "pass123", "123 Street", "0123456789", "test@example.com", 2, 1);
         Cart mockCart = new Cart();
 
-        Product mockProduct = new Product(1, "Laptop", 100, "Black", 1000.0, 10, 0, false, "laptop.jpg", "Desc", 5.0, true, null, null);
+        Product mockProduct = new Product(1, "Paint A", 100, "Black", 1000.0, 10, 0, false, "paint.jpg", "Desc", 5.0, true, null, null);
         Item mockItem = new Item(mockProduct, 2);
+
         mockCart.addItem(mockItem);
 
-        // Mock ResultSet trả về OrderID giả lập
+        // Mock OrderID trả về từ ResultSet
         when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getInt(1)).thenReturn(1001);
+        when(mockResultSet.getInt(1)).thenReturn(1);
 
         // Mock executeUpdate()
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
@@ -62,8 +63,10 @@ public class OrderDAOTest {
         // Gọi hàm cần test
         orderDAO.addOrder(mockUser, mockCart);
 
-        // Kiểm tra xem executeUpdate() có được gọi không
+        // Kiểm tra INSERT Orders được gọi
         verify(mockPreparedStatement, atLeastOnce()).executeUpdate();
+
+        
     }
 
 }
