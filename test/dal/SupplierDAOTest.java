@@ -78,7 +78,6 @@ public class SupplierDAOTest {
         when(connection.prepareStatement(sql)).thenReturn(stm);
         when(stm.executeQuery()).thenReturn(rs);
 
-        // Mock rs.next() luôn trả về false => không có dữ liệu
         when(rs.next()).thenReturn(false);
 
         List<Supplier> sup = dao.getAll();
