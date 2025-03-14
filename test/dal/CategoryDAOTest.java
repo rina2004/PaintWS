@@ -71,6 +71,7 @@ public class CategoryDAOTest {
         categoryDAO.create(category);
 
         // Verifications
+        verify(mockPreparedStatement, times(1)).executeUpdate();
         if (mockResultSet.next()) {
             assertEquals(1, mockResultSet.getInt("CategoryID"));
             assertEquals("New Category", mockResultSet.getInt("CategoryName"));
@@ -85,6 +86,23 @@ public class CategoryDAOTest {
 
         NullPointerException e = assertThrows(NullPointerException.class, () -> categoryDAO.create(category));
         assertEquals("Cannot invoke a null category", e.getMessage());
+    }
+    
+    @Test
+    public void testCreate_ExistedCategory() throws SQLException {
+        // Prepare test data
+        Category category = new Category();
+        category.setName("New Category");
+        category.setDescribe("New category description");
+
+        // Execute the method to test
+        categoryDAO.create(category);
+
+        // Configure mocks
+        when(mockPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
+        
+        SQLException ex = assertThrows(SQLException.class, () -> categoryDAO.create(category));
+        assertEquals(null, ex.getMessage());
     }
 
     //--------------------
@@ -180,6 +198,7 @@ public class CategoryDAOTest {
         categoryDAO.update(category);
 
         // Verifications
+        verify(mockPreparedStatement, times(2)).executeUpdate();
         if (mockResultSet.next()) {
             assertEquals(1, mockResultSet.getInt("CategoryID"));
             assertEquals("Updated Category", mockResultSet.getInt("CategoryName"));
@@ -205,6 +224,7 @@ public class CategoryDAOTest {
         categoryDAO.update(category);
 
         // Verifications
+        verify(mockPreparedStatement, times(2)).executeUpdate();
         if (mockResultSet.next()) {
             assertEquals(1, mockResultSet.getInt("CategoryID"));
             assertEquals("New Category", mockResultSet.getInt("CategoryName"));
@@ -230,6 +250,7 @@ public class CategoryDAOTest {
         categoryDAO.delete(category);
 
         // Verifications
+        verify(mockPreparedStatement, times(2)).executeUpdate();
         if (mockResultSet.next()) {
             assertEquals(true, mockResultSet.getBoolean("isDeleted"));
         }
@@ -250,6 +271,7 @@ public class CategoryDAOTest {
         categoryDAO.delete(category);
 
         // Verifications
+        verify(mockPreparedStatement, times(2)).executeUpdate();
         if (mockResultSet.next()) {
             assertEquals(false, mockResultSet.getBoolean("isDeleted"));
         }
