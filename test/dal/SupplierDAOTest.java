@@ -72,6 +72,21 @@ public class SupplierDAOTest {
     }
 
     @Test
+    public void testGetAll_EmptyResultSet() throws SQLException {
+        String sql = "SELECT * FROM Suppliers";
+
+        when(connection.prepareStatement(sql)).thenReturn(stm);
+        when(stm.executeQuery()).thenReturn(rs);
+
+        // Mock rs.next() luôn trả về false => không có dữ liệu
+        when(rs.next()).thenReturn(false);
+
+        List<Supplier> sup = dao.getAll();
+        assertNotNull(sup);
+        assertEquals(0, sup.size());
+    }
+
+    @Test
     public void testGetSupplierById() throws SQLException {
         String sql = "SELECT * FROM [dbo].[Suppliers] WHERE SupplierID = ?";
 
@@ -110,9 +125,8 @@ public class SupplierDAOTest {
         assertEquals("USA", sp2.getCountry());
         assertEquals("0987654321", sp2.getPhone());
 
-        
-        assertNull(sp3); 
-        assertNull(sp4); 
+        assertNull(sp3);
+        assertNull(sp4);
     }
 
 }
