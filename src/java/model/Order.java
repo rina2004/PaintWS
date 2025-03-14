@@ -68,15 +68,8 @@ public class Order {
         this.status = status;
     }
     
-     // Tính tổng giá trị đơn hàng từ giỏ hàng
     public void calculateTotalFromCart(Cart cart) {
         this.total = cart.getTotalPrice();
     }
 
-    @Override
-    public String toString() {
-        return "Order{" + "userID=" + userID + ", orderId=" + orderId + ", total=" + total + ", date=" + date + ", status=" + status + '}';
-    }
-    
-    
 }
