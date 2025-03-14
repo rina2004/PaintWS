@@ -64,16 +64,17 @@ public class ChartControl extends HttpServlet {
         // Get data for all charts
         List<BestSellingProduct> bestSellers = dao.getBestSellingProducts();
         List<BestSellingProduct> topSellers = dao.getTopSellingProducts(topLimit);
-        List<CategorySales> categorySales = dao.getSalesByCategory();
+//        List<CategorySales> categorySales = dao.getSalesByCategory();
 //        List<MonthlySales> monthlySales = dao.getMonthlySales();
-        Map<String, Object> comparison = dao.compareMonthlyRevenue(month1, month2);
+//        Map<String, Object> comparison = dao.compareMonthlyRevenue(month1, month2);
+        
         
         // Set attributes for JSP
         request.setAttribute("bestSellers", bestSellers);
         request.setAttribute("topSellers", topSellers);
-        request.setAttribute("categorySales", categorySales);
+//        request.setAttribute("categorySales", categorySales);
 //        request.setAttribute("monthlySales", monthlySales);
-        request.setAttribute("comparison", comparison);
+//        request.setAttribute("comparison", comparison);
         
         // Forward to JSP
         request.getRequestDispatcher("Chart.jsp").forward(request, response);
@@ -92,33 +93,33 @@ public class ChartControl extends HttpServlet {
     }
     
     // For AJAX requests to get specific data
-    @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("application/json;charset=UTF-8");
-        
-        ChartDAO dao = new ChartDAO();
-        String action = request.getParameter("action");
-        
-        if ("compareMonths".equals(action)) {
-            try {
-                int month1 = Integer.parseInt(request.getParameter("month1"));
-                int month2 = Integer.parseInt(request.getParameter("month2"));
-                Map<String, Object> comparison = dao.compareMonthlyRevenue(month1, month2);
-                
-                // Convert to JSON and write to response
-                String jsonResponse = "{\"month1\":" + comparison.get("month1") + 
-                        ",\"month2\":" + comparison.get("month2") + 
-                        ",\"revenue1\":" + comparison.get("revenue1") + 
-                        ",\"revenue2\":" + comparison.get("revenue2") + 
-                        ",\"percentageChange\":" + comparison.get("percentageChange") + "}";
-                
-                response.getWriter().write(jsonResponse);
-            } catch (Exception e) {
-                response.getWriter().write("{\"error\":\"Invalid parameters\"}");
-            }
-        } else {
-            response.getWriter().write("{\"error\":\"Unknown action\"}");
-        }
-    }
+//    @Override
+//    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//        response.setContentType("application/json;charset=UTF-8");
+//        
+//        ChartDAO dao = new ChartDAO();
+//        String action = request.getParameter("action");
+//        
+//        if ("compareMonths".equals(action)) {
+//            try {
+//                int month1 = Integer.parseInt(request.getParameter("month1"));
+//                int month2 = Integer.parseInt(request.getParameter("month2"));
+//                Map<String, Object> comparison = dao.compareMonthlyRevenue(month1, month2);
+//                
+//                // Convert to JSON and write to response
+//                String jsonResponse = "{\"month1\":" + comparison.get("month1") + 
+//                        ",\"month2\":" + comparison.get("month2") + 
+//                        ",\"revenue1\":" + comparison.get("revenue1") + 
+//                        ",\"revenue2\":" + comparison.get("revenue2") + 
+//                        ",\"percentageChange\":" + comparison.get("percentageChange") + "}";
+//                
+//                response.getWriter().write(jsonResponse);
+//            } catch (Exception e) {
+//                response.getWriter().write("{\"error\":\"Invalid parameters\"}");
+//            }
+//        } else {
+//            response.getWriter().write("{\"error\":\"Unknown action\"}");
+//        }
+//    }
 }
