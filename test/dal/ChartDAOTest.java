@@ -61,22 +61,40 @@ public class ChartDAOTest {
     @Test
     public void testGetBestSellingProducts_WithMockData() throws SQLException {
         // Setup mock data
-        when(mockResultSet.next()).thenReturn(true, true, false);
-        when(mockResultSet.getString("ProductTitle")).thenReturn("Sơn Dulux", "Sơn Jotun");
-        when(mockResultSet.getInt("TotalQuantitySold")).thenReturn(100, 50);
+        when(mockResultSet.next()).thenReturn(true, false);
+        when(mockResultSet.getString("ProductTitle")).thenReturn("Sơn Dulux");
+        when(mockResultSet.getInt("TotalQuantitySold")).thenReturn(100);
 
         List<BestSellingProduct> result = chartDAO.getBestSellingProducts();
 
-        assertEquals(2, result.size());
+        assertEquals(1, result.size());
         assertEquals("Sơn Dulux", result.get(0).getProductName());
         assertEquals(100, result.get(0).getTotalQuantitySold());
-        assertEquals("Sơn Jotun", result.get(1).getProductName());
-        assertEquals(50, result.get(1).getTotalQuantitySold());
 
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).executeQuery();
-        verify(mockResultSet, times(3)).next();
+        verify(mockResultSet, times(2)).next();
+    }
+
+    @Test
+    public void testGetBestSellingProducts_WithNullValues() throws SQLException {
+        // Setup mock data with null values - just one row with null values
+        when(mockResultSet.next()).thenReturn(true, false);
+        when(mockResultSet.getString("ProductTitle")).thenReturn(null);
+        when(mockResultSet.getInt("TotalQuantitySold")).thenReturn(0);
+
+        List<BestSellingProduct> result = chartDAO.getBestSellingProducts();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getProductName());
+        assertEquals(0, result.get(0).getTotalQuantitySold());
+
+        // Verify interactions
+        verify(mockConnection).prepareStatement(anyString());
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(2)).next();
     }
 
     @Test
@@ -98,13 +116,13 @@ public class ChartDAOTest {
     @Test
     public void testGetTopSellingProducts_WithMockData() throws SQLException {
         // Setup mock data
-        when(mockResultSet.next()).thenReturn(true, true, false);
-        when(mockResultSet.getString("ProductTitle")).thenReturn("Sơn Dulux", "Sơn Jotun");
-        when(mockResultSet.getInt("TotalQuantitySold")).thenReturn(100, 50);
+        when(mockResultSet.next()).thenReturn(true, false);
+        when(mockResultSet.getString("ProductTitle")).thenReturn("Sơn Dulux");
+        when(mockResultSet.getInt("TotalQuantitySold")).thenReturn(100);
 
         List<BestSellingProduct> result = chartDAO.getTopSellingProducts(5);
 
-        assertEquals(2, result.size());
+        assertEquals(1, result.size());
         assertEquals("Sơn Dulux", result.get(0).getProductName());
         assertEquals(100, result.get(0).getTotalQuantitySold());
 
@@ -132,19 +150,15 @@ public class ChartDAOTest {
     @Test
     public void testGetTopSellingProducts_LargeLimit() throws SQLException {
         // Setup mock data
-        when(mockResultSet.next()).thenReturn(true, true, true, false);
-        when(mockResultSet.getString("ProductTitle")).thenReturn("Sơn Dulux", "Sơn Jotun", "Sơn Mykolor");
-        when(mockResultSet.getInt("TotalQuantitySold")).thenReturn(100, 50, 30);
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getString("ProductTitle")).thenReturn("Sơn Dulux", "Sơn Mykolor");
+        when(mockResultSet.getInt("TotalQuantitySold")).thenReturn(100, 30);
 
         List<BestSellingProduct> result = chartDAO.getTopSellingProducts(100);
 
-        assertEquals(3, result.size());
+        assertEquals(2, result.size());
         assertEquals("Sơn Dulux", result.get(0).getProductName());
         assertEquals(100, result.get(0).getTotalQuantitySold());
-        assertEquals("Sơn Jotun", result.get(1).getProductName());
-        assertEquals(50, result.get(1).getTotalQuantitySold());
-        assertEquals("Sơn Mykolor", result.get(2).getProductName());
-        assertEquals(30, result.get(2).getTotalQuantitySold());
 
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
@@ -152,39 +166,56 @@ public class ChartDAOTest {
         verify(mockPreparedStatement).executeQuery();
     }
 
-    @Test
-    public void testGetTopSellingProducts_ZeroLimit() throws SQLException {
-        // Test with zero limit
-        List<BestSellingProduct> result = chartDAO.getTopSellingProducts(0);
-
-        assertTrue(result.isEmpty());
-
-        // Verify interactions
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 0);
-        verify(mockPreparedStatement).executeQuery();
-    }
-
     // -------------------- getSalesByCategory Tests --------------------
     @Test
     public void testGetSalesByCategory_WithMockData() throws SQLException {
-        // Setup mock data
-        when(mockResultSet.next()).thenReturn(true, true, false);
-        when(mockResultSet.getString("CategoryName")).thenReturn("Sơn Nội Thất", "Sơn Ngoại Thất");
-        when(mockResultSet.getInt("TotalSold")).thenReturn(150, 100);
+        when(mockResultSet.next()).thenReturn(true, false);
+        when(mockResultSet.getInt("CategoryID")).thenReturn(1);
+        when(mockResultSet.getString("CategoryName")).thenReturn("Sơn Nội Thất");
+        when(mockResultSet.getString("Description")).thenReturn("Mô tả sơn nội thất");
+        when(mockResultSet.getInt("TotalSold")).thenReturn(150);
 
-        List<CategorySales> result = chartDAO.getSalesByCategory();
+        List<Category> result = chartDAO.getSalesByCategory();
 
-        assertEquals(2, result.size());
-        assertEquals("Sơn Nội Thất", result.get(0).getCategoryName());
-        assertEquals(150, result.get(0).getTotalSold());
-        assertEquals("Sơn Ngoại Thất", result.get(1).getCategoryName());
-        assertEquals(100, result.get(1).getTotalSold());
+        assertEquals(1, result.size());
+        assertEquals("Sơn Nội Thất", result.get(0).getName());
+        assertEquals(1, result.get(0).getId());
+        assertEquals("Mô tả sơn nội thất", result.get(0).getDescribe());
+        assertEquals(150, chartDAO.getTotalSoldForCategory(1));
 
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).executeQuery();
-        verify(mockResultSet, times(3)).next();
+        verify(mockResultSet, times(2)).next(); // Called twice (once true, once false)
+        verify(mockResultSet, times(1)).getInt("CategoryID");
+        verify(mockResultSet, times(1)).getString("CategoryName");
+        verify(mockResultSet, times(1)).getString("Description");
+        verify(mockResultSet, times(1)).getInt("TotalSold");
+    }
+
+    @Test
+    public void testGetSalesByCategory_WithNullValues() throws SQLException {
+        // Setup mock data with null values
+        when(mockResultSet.next()).thenReturn(true, false);
+        when(mockResultSet.getInt("CategoryID")).thenReturn(1);
+        when(mockResultSet.getString("CategoryName")).thenReturn(null);
+        when(mockResultSet.getString("Description")).thenReturn(null);
+        when(mockResultSet.getInt("TotalSold")).thenReturn(0);
+
+        List<Category> result = chartDAO.getSalesByCategory();
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getName());
+        assertNull(result.get(0).getDescribe());
+        assertEquals(1, result.get(0).getId());
+
+        // Check the sales data in the map
+        assertEquals(0, chartDAO.getTotalSoldForCategory(1));
+
+        // Verify interactions
+        verify(mockConnection).prepareStatement(anyString());
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(2)).next();  // Called twice (once true, once false)
     }
 
     @Test
@@ -192,8 +223,7 @@ public class ChartDAOTest {
         // Setup mock data for empty result set
         when(mockResultSet.next()).thenReturn(false);
 
-        List<CategorySales> result = chartDAO.getSalesByCategory();
-
+        List<Category> result = chartDAO.getSalesByCategory();
         assertTrue("Result should be empty", result.isEmpty());
 
         // Verify interactions
@@ -202,63 +232,18 @@ public class ChartDAOTest {
         verify(mockResultSet).next();
     }
 
-    @Test
-    public void testGetSalesByCategory_WithZeroSales() throws SQLException {
-        // Setup mock data with zero sales
-        when(mockResultSet.next()).thenReturn(true, false);
-        when(mockResultSet.getString("CategoryName")).thenReturn("Sơn Trang Trí");
-        when(mockResultSet.getInt("TotalSold")).thenReturn(0);
-
-        List<CategorySales> result = chartDAO.getSalesByCategory();
-
-        assertEquals(1, result.size());
-        assertEquals("Sơn Trang Trí", result.get(0).getCategoryName());
-        assertEquals(0, result.get(0).getTotalSold());
-
-        // Verify interactions
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).executeQuery();
-    }
-
-    @Test
-    public void testGetSalesByCategory_NullCategoryName() throws SQLException {
-        // Setup mock data with null category name
-        when(mockResultSet.next()).thenReturn(true, false);
-        when(mockResultSet.getString("CategoryName")).thenReturn(null);
-        when(mockResultSet.getInt("TotalSold")).thenReturn(100);
-
-        List<CategorySales> result = chartDAO.getSalesByCategory();
-
-        assertEquals(1, result.size());
-        assertNull(result.get(0).getCategoryName());
-        assertEquals(100, result.get(0).getTotalSold());
-
-        // Verify interactions
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).executeQuery();
-    }
-    
     // -------------------- updatePaint Tests --------------------
     @Test
     public void testUpdatePaint_Success() throws SQLException {
-        // Create mock objects
-        Supplier supplier = mock(Supplier.class);
-        when(supplier.getId()).thenReturn(1);
-
-        Category category = mock(Category.class);
-        when(category.getId()).thenReturn(2);
-
         // Create test paint object
         Product paint = mock(Product.class);
         when(paint.getProductID()).thenReturn(1);
-        when(paint.getProductName()).thenReturn("Updated Paint Name");
-        when(paint.getSupplier()).thenReturn(supplier);
-        when(paint.getCategory()).thenReturn(category);
+        when(paint.getProductName()).thenReturn("Test Paint");
         when(paint.getVolume()).thenReturn(5.0);
         when(paint.getColor()).thenReturn("Blue");
-        when(paint.getUnitPrice()).thenReturn(1500.0);
+        when(paint.getUnitPrice()).thenReturn(1000.0);
         when(paint.getUnitsInStock()).thenReturn(100);
-        when(paint.getQuantitySold()).thenReturn(50);
+        when(paint.getQuantitySold()).thenReturn(100);
         when(paint.isDiscontinued()).thenReturn(false);
         when(paint.getImage()).thenReturn("image-url.jpg");
         when(paint.getDescription()).thenReturn("Updated description");
@@ -267,85 +252,37 @@ public class ChartDAOTest {
         // Mock executeUpdate to return 1 (1 row affected)
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
-        boolean result = chartDAO.updatePaint(paint);
+        int affectedRows = chartDAO.update(paint);
 
-        assertTrue("Update should be successful", result);
-
-        // Verify interactions
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setString(1, "Updated Paint Name");
-        verify(mockPreparedStatement).setInt(2, 1); // supplier ID
-        verify(mockPreparedStatement).setInt(3, 2); // category ID
-        verify(mockPreparedStatement).setDouble(4, 5.0); // volume
-        verify(mockPreparedStatement).setString(5, "Blue"); // color
-        verify(mockPreparedStatement).setDouble(6, 1500.0); // unit price
-        verify(mockPreparedStatement).setInt(7, 100); // units in stock
-        verify(mockPreparedStatement).setInt(8, 50); // quantity sold
-        verify(mockPreparedStatement).setBoolean(9, false); // discontinued
-        verify(mockPreparedStatement).setString(10, "image-url.jpg"); // image
-        verify(mockPreparedStatement).setString(11, "Updated description"); // description
-        verify(mockPreparedStatement).setBoolean(12, true); // status
-        verify(mockPreparedStatement).setInt(13, 1); // product ID
-        verify(mockPreparedStatement).executeUpdate();
-    }
-
-    @Test
-    public void testUpdatePaint_Failure() throws SQLException {
-        // Create mock objects
-        Supplier supplier = mock(Supplier.class);
-        when(supplier.getId()).thenReturn(1);
-
-        Category category = mock(Category.class);
-        when(category.getId()).thenReturn(2);
-
-        // Create test paint object
-        Product paint = mock(Product.class);
-        when(paint.getProductID()).thenReturn(1);
-        when(paint.getProductName()).thenReturn("Updated Paint Name");
-        when(paint.getSupplier()).thenReturn(supplier);
-        when(paint.getCategory()).thenReturn(category);
-        when(paint.getVolume()).thenReturn(5.0);
-        when(paint.getColor()).thenReturn("Blue");
-        when(paint.getUnitPrice()).thenReturn(1500.0);
-        when(paint.getUnitsInStock()).thenReturn(100);
-        when(paint.getQuantitySold()).thenReturn(50);
-        when(paint.isDiscontinued()).thenReturn(false);
-        when(paint.getImage()).thenReturn("image-url.jpg");
-        when(paint.getDescription()).thenReturn("Updated description");
-        when(paint.isStatus()).thenReturn(true);
-
-        // Mock executeUpdate to return 0 (no rows affected)
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-
-        boolean result = chartDAO.updatePaint(paint);
-
-        assertFalse("Update should fail when no rows affected", result);
+        assertEquals("Should return 1 affected row", 1, affectedRows);
 
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
+        verify(mockPreparedStatement).setString(1, "Test Paint");
+        verify(mockPreparedStatement).setDouble(2, 5.0); // volume
+        verify(mockPreparedStatement).setString(3, "Blue"); // color
+        verify(mockPreparedStatement).setDouble(4, 1000.0); // unit price
+        verify(mockPreparedStatement).setInt(5, 100); // units in stock
+        verify(mockPreparedStatement).setInt(6, 100); // quantity sold
+        verify(mockPreparedStatement).setBoolean(7, false); // discontinued
+        verify(mockPreparedStatement).setString(8, "image-url.jpg"); // image
+        verify(mockPreparedStatement).setString(9, "Updated description"); // description
+        verify(mockPreparedStatement).setBoolean(10, true); // status
+        verify(mockPreparedStatement).setInt(11, 1); // product ID
         verify(mockPreparedStatement).executeUpdate();
     }
 
     @Test
     public void testUpdatePaint_WithNullValues() throws SQLException {
-        // Create mock objects with some null values
-        Supplier supplier = mock(Supplier.class);
-        when(supplier.getId()).thenReturn(1);
-
-        Category category = mock(Category.class);
-        when(category.getId()).thenReturn(2);
-
         // Create test paint object with some null values
         Product paint = mock(Product.class);
         when(paint.getProductID()).thenReturn(1);
         when(paint.getProductName()).thenReturn("Test Paint");
-        when(paint.getSupplier()).thenReturn(supplier);
-        when(paint.getCategory()).thenReturn(category);
         when(paint.getVolume()).thenReturn(0.0);
         when(paint.getColor()).thenReturn(null); // Null color
         when(paint.getUnitPrice()).thenReturn(1000.0);
-        when(paint.getUnitsInStock()).thenReturn(50);
-        when(paint.getQuantitySold()).thenReturn(25);
+        when(paint.getUnitsInStock()).thenReturn(100);
+        when(paint.getQuantitySold()).thenReturn(100);
         when(paint.isDiscontinued()).thenReturn(false);
         when(paint.getImage()).thenReturn(null); // Null image
         when(paint.getDescription()).thenReturn(null); // Null description
@@ -354,32 +291,162 @@ public class ChartDAOTest {
         // Mock executeUpdate to return 1 (1 row affected)
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
-        boolean result = chartDAO.updatePaint(paint);
+        int affectedRows = chartDAO.update(paint);
 
-        assertTrue("Update should be successful even with null values", result);
+        assertEquals("Should return 1 affected row", 1, affectedRows);
 
         // Verify interactions - check that null values are properly handled
         verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setDouble(eq(4), eq(0.0d)); // Null volume
-        verify(mockPreparedStatement).setString(eq(5), isNull()); // Null color
-        verify(mockPreparedStatement).setString(eq(10), isNull()); // Null image
-        verify(mockPreparedStatement).setString(eq(11), isNull()); // Null description
+        verify(mockPreparedStatement).setDouble(eq(2), eq(0.0d)); // Volume
+        verify(mockPreparedStatement).setString(eq(3), isNull()); // Null color
+        verify(mockPreparedStatement).setString(eq(8), isNull()); // Null image
+        verify(mockPreparedStatement).setString(eq(9), isNull()); // Null description
         verify(mockPreparedStatement).executeUpdate();
     }
-    
+
+    @Test
+    public void testUpdatePaint_Failure() throws SQLException {
+        // Create test paint object
+        Product paint = mock(Product.class);
+        when(paint.getProductID()).thenReturn(1);
+        when(paint.getProductName()).thenReturn("Test Paint");
+        when(paint.getVolume()).thenReturn(5.0);
+        when(paint.getColor()).thenReturn("Blue");
+        when(paint.getUnitPrice()).thenReturn(1000.0);
+        when(paint.getUnitsInStock()).thenReturn(100);
+        when(paint.getQuantitySold()).thenReturn(100);
+        when(paint.isDiscontinued()).thenReturn(false);
+        when(paint.getImage()).thenReturn("image-url.jpg");
+        when(paint.getDescription()).thenReturn("Updated description");
+        when(paint.isStatus()).thenReturn(true);
+
+        // Mock executeUpdate to return 0 (no rows affected)
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+
+        int affectedRows = chartDAO.update(paint);
+
+        assertEquals("Should return 0 affected rows", 0, affectedRows);
+
+        // Verify interactions
+        verify(mockConnection).prepareStatement(anyString());
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
+    @Test
+    public void testUpdatePaint_NullPaint() throws SQLException {
+        // Test with null paint object
+        int affectedRows = chartDAO.update(null);
+
+        assertEquals("Should return 0 for null paint", 0, affectedRows);
+
+        // Verify no interactions with prepared statement
+        verify(mockConnection, never()).prepareStatement(anyString());
+    }
+
+    @Test
+    public void testUpdatePaint_NullProductName() throws SQLException {
+        // Create test paint object with null product name
+        Product paint = mock(Product.class);
+        when(paint.getProductName()).thenReturn(null);
+
+        int affectedRows = chartDAO.update(paint);
+
+        assertEquals("Should return 0 for null product name", 0, affectedRows);
+
+        // Verify no interactions with prepared statement
+        verify(mockConnection, never()).prepareStatement(anyString());
+    }
+
+    @Test
+    public void testUpdatePaint_EmptyProductName() throws SQLException {
+        // Create test paint object with empty product name
+        Product paint = mock(Product.class);
+        when(paint.getProductName()).thenReturn("");
+
+        int affectedRows = chartDAO.update(paint);
+
+        assertEquals("Should return 0 for empty product name", 0, affectedRows);
+
+        // Verify no interactions with prepared statement
+        verify(mockConnection, never()).prepareStatement(anyString());
+    }
+
+    @Test
+    public void testUpdatePaint_WhitespaceProductName() throws SQLException {
+        // Create test paint object with whitespace-only product name
+        Product paint = mock(Product.class);
+        when(paint.getProductName()).thenReturn("   ");
+
+        int affectedRows = chartDAO.update(paint);
+
+        assertEquals("Should return 0 for whitespace product name", 0, affectedRows);
+
+        // Verify no interactions with prepared statement
+        verify(mockConnection, never()).prepareStatement(anyString());
+    }
+
+    @Test
+    public void testUpdatePaint_NegativeVolume() throws SQLException {
+        // Create test paint object with negative volume
+        Product paint = mock(Product.class);
+        when(paint.getProductName()).thenReturn("Test Paint");
+        when(paint.getVolume()).thenReturn(-5.0);
+
+        int affectedRows = chartDAO.update(paint);
+
+        assertEquals("Should return 0 for negative volume", 0, affectedRows);
+
+        // Verify no interactions with prepared statement
+        verify(mockConnection, never()).prepareStatement(anyString());
+    }
+
+    @Test
+    public void testUpdatePaint_NegativeUnitPrice() throws SQLException {
+        // Create test paint object with negative unit price
+        Product paint = mock(Product.class);
+        when(paint.getProductName()).thenReturn("Test Paint");
+        when(paint.getVolume()).thenReturn(5.0);
+        when(paint.getUnitPrice()).thenReturn(-1000.0);
+
+        int affectedRows = chartDAO.update(paint);
+
+        assertEquals("Should return 0 for negative unit price", 0, affectedRows);
+
+        // Verify no interactions with prepared statement
+        verify(mockConnection, never()).prepareStatement(anyString());
+    }
+
+    @Test
+    public void testUpdatePaint_NegativeUnitsInStock() throws SQLException {
+        // Create test paint object with negative units in stock
+        Product paint = mock(Product.class);
+        when(paint.getProductName()).thenReturn("Test Paint");
+        when(paint.getVolume()).thenReturn(5.0);
+        when(paint.getUnitPrice()).thenReturn(1000.0);
+        when(paint.getUnitsInStock()).thenReturn(-100);
+
+        int affectedRows = chartDAO.update(paint);
+
+        assertEquals("Should return 0 for negative units in stock", 0, affectedRows);
+
+        // Verify no interactions with prepared statement
+        verify(mockConnection, never()).prepareStatement(anyString());
+    }
+
     // -------------------- compareMonthlyRevenue Tests --------------------
     @Test
     public void testCompareMonthlyRevenue_WithMockData() throws SQLException {
         // Setup mock data
         when(mockResultSet.next()).thenReturn(true, true, false);
         when(mockResultSet.getInt("Month")).thenReturn(1, 2);
+        when(mockResultSet.getInt("Year")).thenReturn(2023, 2023);
         when(mockResultSet.getDouble("Revenue")).thenReturn(10000.0, 15000.0);
 
-        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2);
+        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2023, 2, 2023);
 
         // Verify results
-        assertEquals(1, result.get("month1"));
-        assertEquals(2, result.get("month2"));
+        assertEquals("2023-1", result.get("period1"));
+        assertEquals("2023-2", result.get("period2"));
         assertEquals(10000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(15000.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
         assertEquals(50.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
@@ -387,7 +454,9 @@ public class ChartDAOTest {
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).setInt(2, 2);
+        verify(mockPreparedStatement).setInt(2, 2023);
+        verify(mockPreparedStatement).setInt(3, 2);
+        verify(mockPreparedStatement).setInt(4, 2023);
         verify(mockPreparedStatement).executeQuery();
     }
 
@@ -396,13 +465,14 @@ public class ChartDAOTest {
         // Setup mock data with only one month having data
         when(mockResultSet.next()).thenReturn(true, false);
         when(mockResultSet.getInt("Month")).thenReturn(1);
+        when(mockResultSet.getInt("Year")).thenReturn(2023);
         when(mockResultSet.getDouble("Revenue")).thenReturn(10000.0);
 
-        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2);
+        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2023, 2, 2023);
 
         // Verify results
-        assertEquals(1, result.get("month1"));
-        assertEquals(2, result.get("month2"));
+        assertEquals("2023-1", result.get("period1"));
+        assertEquals("2023-2", result.get("period2"));
         assertEquals(10000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(0.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
         assertEquals(-100.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
@@ -410,7 +480,9 @@ public class ChartDAOTest {
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).setInt(2, 2);
+        verify(mockPreparedStatement).setInt(2, 2023);
+        verify(mockPreparedStatement).setInt(3, 2);
+        verify(mockPreparedStatement).setInt(4, 2023);
         verify(mockPreparedStatement).executeQuery();
     }
 
@@ -419,11 +491,11 @@ public class ChartDAOTest {
         // Setup mock data with no data
         when(mockResultSet.next()).thenReturn(false);
 
-        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2);
+        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2023, 2, 2023);
 
         // Verify results
-        assertEquals(1, result.get("month1"));
-        assertEquals(2, result.get("month2"));
+        assertEquals("2023-1", result.get("period1"));
+        assertEquals("2023-2", result.get("period2"));
         assertEquals(0.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(0.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
         assertEquals(0.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
@@ -431,7 +503,9 @@ public class ChartDAOTest {
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).setInt(2, 2);
+        verify(mockPreparedStatement).setInt(2, 2023);
+        verify(mockPreparedStatement).setInt(3, 2);
+        verify(mockPreparedStatement).setInt(4, 2023);
         verify(mockPreparedStatement).executeQuery();
     }
 
@@ -440,13 +514,14 @@ public class ChartDAOTest {
         // Setup mock data with zero revenue in first month
         when(mockResultSet.next()).thenReturn(true, true, false);
         when(mockResultSet.getInt("Month")).thenReturn(1, 2);
+        when(mockResultSet.getInt("Year")).thenReturn(2023, 2023);
         when(mockResultSet.getDouble("Revenue")).thenReturn(0.0, 15000.0);
 
-        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2);
+        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2023, 2, 2023);
 
         // Verify results
-        assertEquals(1, result.get("month1"));
-        assertEquals(2, result.get("month2"));
+        assertEquals("2023-1", result.get("period1"));
+        assertEquals("2023-2", result.get("period2"));
         assertEquals(0.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(15000.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
         assertEquals(0.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001); // No division by zero
@@ -454,23 +529,25 @@ public class ChartDAOTest {
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).setInt(2, 2);
+        verify(mockPreparedStatement).setInt(2, 2023);
+        verify(mockPreparedStatement).setInt(3, 2);
+        verify(mockPreparedStatement).setInt(4, 2023);
         verify(mockPreparedStatement).executeQuery();
     }
 
-    // Detailed test for compareMonthlyRevenue
     @Test
     public void testCompareMonthlyRevenue_DecreaseInRevenue() throws SQLException {
         // Setup mock data for decreasing revenue
         when(mockResultSet.next()).thenReturn(true, true, false);
         when(mockResultSet.getInt("Month")).thenReturn(4, 5);
+        when(mockResultSet.getInt("Year")).thenReturn(2023, 2023);
         when(mockResultSet.getDouble("Revenue")).thenReturn(20000.0, 10000.0);
 
-        Map<String, Object> result = chartDAO.compareMonthlyRevenue(4, 5);
+        Map<String, Object> result = chartDAO.compareMonthlyRevenue(4, 2023, 5, 2023);
 
         // Verify results - should show negative percentage change
-        assertEquals(4, result.get("month1"));
-        assertEquals(5, result.get("month2"));
+        assertEquals("2023-4", result.get("period1"));
+        assertEquals("2023-5", result.get("period2"));
         assertEquals(20000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(10000.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
         assertEquals(-50.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
@@ -478,30 +555,25 @@ public class ChartDAOTest {
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setInt(1, 4);
-        verify(mockPreparedStatement).setInt(2, 5);
+        verify(mockPreparedStatement).setInt(2, 2023);
+        verify(mockPreparedStatement).setInt(3, 5);
+        verify(mockPreparedStatement).setInt(4, 2023);
         verify(mockPreparedStatement).executeQuery();
     }
 
-    // Invalid input test for compareMonthlyRevenue
-    @Test(expected = IllegalArgumentException.class)
-    public void testCompareMonthlyRevenue_InvalidMonth() throws SQLException {
-        // Should throw IllegalArgumentException for invalid month values
-        chartDAO.compareMonthlyRevenue(0, 13);
-    }
-
-    // Equal month test for compareMonthlyRevenue
     @Test
     public void testCompareMonthlyRevenue_SameMonth() throws SQLException {
-        // Setup mock data for same month
+        // Setup mock data for same month and year
         when(mockResultSet.next()).thenReturn(true, false);
         when(mockResultSet.getInt("Month")).thenReturn(6);
+        when(mockResultSet.getInt("Year")).thenReturn(2023);
         when(mockResultSet.getDouble("Revenue")).thenReturn(15000.0);
 
-        Map<String, Object> result = chartDAO.compareMonthlyRevenue(6, 6);
+        Map<String, Object> result = chartDAO.compareMonthlyRevenue(6, 2023, 6, 2023);
 
         // Verify results - should handle comparing same month
-        assertEquals(6, result.get("month1"));
-        assertEquals(6, result.get("month2"));
+        assertEquals("2023-6", result.get("period1"));
+        assertEquals("2023-6", result.get("period2"));
         assertEquals(15000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(0.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
         // Percentage change should reflect comparing month to itself
@@ -510,30 +582,77 @@ public class ChartDAOTest {
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setInt(1, 6);
-        verify(mockPreparedStatement).setInt(2, 6);
+        verify(mockPreparedStatement).setInt(2, 2023);
+        verify(mockPreparedStatement).setInt(3, 6);
+        verify(mockPreparedStatement).setInt(4, 2023);
         verify(mockPreparedStatement).executeQuery();
     }
 
     @Test
-    public void testCompareMonthlyRevenue_NonSequentialMonths() throws SQLException {
-        // Setup mock data for non-sequential months (e.g., January vs July)
+    public void testCompareMonthlyRevenue_DifferentYears() throws SQLException {
+        // Setup mock data for different years
         when(mockResultSet.next()).thenReturn(true, true, false);
-        when(mockResultSet.getInt("Month")).thenReturn(1, 7);
-        when(mockResultSet.getDouble("Revenue")).thenReturn(10000.0, 30000.0);
+        when(mockResultSet.getInt("Month")).thenReturn(12, 1);
+        when(mockResultSet.getInt("Year")).thenReturn(2022, 2023);
+        when(mockResultSet.getDouble("Revenue")).thenReturn(18000.0, 21600.0);
 
-        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 7);
+        Map<String, Object> result = chartDAO.compareMonthlyRevenue(12, 2022, 1, 2023);
 
-        // Verify results for comparing non-sequential months
-        assertEquals(1, result.get("month1"));
-        assertEquals(7, result.get("month2"));
-        assertEquals(10000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
-        assertEquals(30000.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
-        assertEquals(200.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
+        // Verify results - should handle year boundary comparison
+        assertEquals("2022-12", result.get("period1"));
+        assertEquals("2023-1", result.get("period2"));
+        assertEquals(18000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
+        assertEquals(21600.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
+        assertEquals(20.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
+
+        // Verify interactions
+        verify(mockConnection).prepareStatement(anyString());
+        verify(mockPreparedStatement).setInt(1, 12);
+        verify(mockPreparedStatement).setInt(2, 2022);
+        verify(mockPreparedStatement).setInt(3, 1);
+        verify(mockPreparedStatement).setInt(4, 2023);
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCompareMonthlyRevenue_InvalidMonth() throws SQLException {
+        // Should throw IllegalArgumentException for month < 1
+        chartDAO.compareMonthlyRevenue(0, 2023, 1, 2023);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCompareMonthlyRevenue_InvalidMonth2() throws SQLException {
+        // Should throw IllegalArgumentException for month > 12
+        chartDAO.compareMonthlyRevenue(1, 2023, 13, 2023);
+    }
+
+    @Test
+    public void testCompareMonthlyRevenue_SecondMonthMissing() throws SQLException {
+        // Setup mock data with only the second month having data
+        when(mockResultSet.next()).thenReturn(true, false);
+        when(mockResultSet.getInt("Month")).thenReturn(2);
+        when(mockResultSet.getInt("Year")).thenReturn(2023);
+        when(mockResultSet.getDouble("Revenue")).thenReturn(12000.0);
+
+        // Explicitly set up that the first month is not found
+        when(mockResultSet.getInt("Month")).thenReturn(2);
+        when(mockResultSet.getInt("Year")).thenReturn(2023);
+
+        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2023, 2, 2023);
+
+        // Verify results
+        assertEquals("2023-1", result.get("period1"));
+        assertEquals("2023-2", result.get("period2"));
+        assertEquals(0.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
+        assertEquals(12000.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
+        assertEquals(0.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
 
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).setInt(2, 7);
+        verify(mockPreparedStatement).setInt(2, 2023);
+        verify(mockPreparedStatement).setInt(3, 2);
+        verify(mockPreparedStatement).setInt(4, 2023);
         verify(mockPreparedStatement).executeQuery();
     }
 }
