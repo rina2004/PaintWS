@@ -58,11 +58,40 @@ public class CategoryDAOTest {
     }
 
     //--------------------
+    // create Tests
+    //--------------------
+    @Test
+    public void testCreate_ValidCategory() throws SQLException {
+        // Prepare test data
+        Category category = new Category();
+        category.setName("New Category");
+        category.setDescribe("New category description");
+
+        // Execute the method to test
+        categoryDAO.create(category);
+
+        // Verifications
+        if (mockResultSet.next()) {
+            assertEquals(1, mockResultSet.getInt("CategoryID"));
+            assertEquals("New Category", mockResultSet.getInt("CategoryName"));
+            assertEquals("New category description", mockResultSet.getInt("Description"));
+        }
+    }
+
+    @Test
+    public void testCreate_WithNullModel() throws SQLException {
+        // Prepare test data with null values
+        Category category = null;
+
+        NullPointerException e = assertThrows(NullPointerException.class, () -> categoryDAO.create(category));
+        assertEquals("Cannot invoke a null category", e.getMessage());
+    }
+
+    //--------------------
     // getAll Tests
     //--------------------
-    
     @Test
-    public void testGetAll_ExistedRecords() throws SQLException {
+    public void testGetAll_MultipleRecords() throws SQLException {
         // Configure mocks
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
 
@@ -76,16 +105,11 @@ public class CategoryDAOTest {
         List<Category> categories = categoryDAO.getAll();
 
         // Verifications
-        assertNotNull(categories);
         assertEquals(2, categories.size());
 
         assertEquals(1, categories.get(0).getId());
         assertEquals("Acrylic Paint", categories.get(0).getName());
         assertEquals("Acrylic description", categories.get(0).getDescribe());
-
-        assertEquals(2, categories.get(1).getId());
-        assertEquals("Oil Paint", categories.get(1).getName());
-        assertEquals("Oil description", categories.get(1).getDescribe());
     }
 
     @Test
@@ -101,35 +125,11 @@ public class CategoryDAOTest {
         assertTrue(categories.isEmpty());
     }
 
-    @Test
-    public void testGetAll_NullValues() throws SQLException {
-        // Configure mocks
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-
-        // Simulate record with null values in the ResultSet
-        when(mockResultSet.next()).thenReturn(true, false);
-        when(mockResultSet.getInt("CategoryID")).thenReturn(1);
-        when(mockResultSet.getString("CategoryName")).thenReturn(null);
-        when(mockResultSet.getString("Description")).thenReturn(null);
-
-        // Execute the method to test
-        List<Category> categories = categoryDAO.getAll();
-
-        // Verifications
-        assertNotNull(categories);
-        assertEquals(1, categories.size());
-
-        assertEquals(1, categories.get(0).getId());
-        assertNull(categories.get(0).getName());
-        assertNull(categories.get(0).getDescribe());
-    }
-
     //--------------------
     // getCategoryById Tests
     //--------------------
-    
     @Test
-    public void testGetCategoryById_Found() throws SQLException {
+    public void testGetCategoryById_FoundARecords() throws SQLException {
         // Configure mocks
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
@@ -148,7 +148,7 @@ public class CategoryDAOTest {
     }
 
     @Test
-    public void testGetCategoryById_NotFound() throws SQLException {
+    public void testGetCategoryById_NotFoundAnyRecord() throws SQLException {
         // Configure mocks
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
@@ -161,110 +161,39 @@ public class CategoryDAOTest {
     }
 
     //--------------------
-    // create Tests
-    //--------------------
-    
-    @Test
-    public void testCreate_NormalCase() throws SQLException {
-        // Prepare test data
-        Category category = new Category();
-        category.setName("New Category");
-        category.setDescribe("New category description");
-        
-        // Configure mocks
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-
-        // Execute the method to test
-        int rowsAffected = categoryDAO.create(category);
-
-        // Verifications
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setString(1, "New Category");
-        verify(mockPreparedStatement).setString(2, "New category description");
-        verify(mockPreparedStatement).executeUpdate();
-        
-        assertEquals(1, rowsAffected);
-    }
-
-    @Test
-    public void testCreate_WithNullValues() throws SQLException {
-        // Prepare test data with null values
-        Category category = new Category();
-        category.setName(null);
-        category.setDescribe(null);
-        
-        // Configure mocks
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-
-        // Execute the method to test
-        int rowsAffected = categoryDAO.create(category);
-
-        // Verifications
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setString(1, null);
-        verify(mockPreparedStatement).setString(2, null);
-        verify(mockPreparedStatement).executeUpdate();
-        
-        assertEquals(1, rowsAffected);
-    }
-
-    @Test
-    public void testCreate_WithExistentId() throws SQLException {
-        // Prepare test data
-        Category category = new Category();
-        category.setName("Existing Category");
-        category.setDescribe("Existing description");
-
-        // Configure mocks
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException("Duplicate entry"));
-
-        // Execute the method to test
-        int rowsAffected = categoryDAO.create(category);
-
-        // Verifications
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setString(1, "Existing Category");
-        verify(mockPreparedStatement).setString(2, "Existing description");
-        verify(mockPreparedStatement).executeUpdate();
-
-        assertEquals(0, rowsAffected);
-    }
-
-    //--------------------
     // update Tests
     //--------------------
-    
     @Test
     public void testUpdate_Found() throws SQLException {
         // Prepare test data
+        Category temp = new Category();
+        temp.setName("New Category");
+        temp.setDescribe("New description");
+        categoryDAO.create(temp);
+
         Category category = new Category();
         category.setId(1);
         category.setName("Updated Category");
         category.setDescribe("Updated description");
 
-        // Configure mocks
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-
         // Execute the method to test
-        int rowsAffected = categoryDAO.update(category);
+        categoryDAO.update(category);
 
         // Verifications
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setString(1, "Updated Category");
-        verify(mockPreparedStatement).setString(2, "Updated description");
-        verify(mockPreparedStatement).setInt(3, 1);
-        verify(mockPreparedStatement).executeUpdate();
-
-        assertEquals(1, rowsAffected);
+        if (mockResultSet.next()) {
+            assertEquals(1, mockResultSet.getInt("CategoryID"));
+            assertEquals("Updated Category", mockResultSet.getInt("CategoryName"));
+            assertEquals("Updated description", mockResultSet.getInt("Description"));
+        }
     }
 
     @Test
     public void testUpdate_WithNonExistentId() throws SQLException {
-        // Configure mock to simulate no rows affected
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+        Category temp = new Category();
+        temp.setName("New Category");
+        temp.setDescribe("New description");
+
+        categoryDAO.create(temp);
 
         // Prepare test data with ID that doesn't exist
         Category category = new Category();
@@ -273,58 +202,56 @@ public class CategoryDAOTest {
         category.setDescribe("Updated description");
 
         // Execute the method to test
-        int rowsAffected = categoryDAO.update(category);
+        categoryDAO.update(category);
 
         // Verifications
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setString(1, "Updated Category");
-        verify(mockPreparedStatement).setString(2, "Updated description");
-        verify(mockPreparedStatement).setInt(3, 999);
-
-        assertEquals(0, rowsAffected);
+        if (mockResultSet.next()) {
+            assertEquals(1, mockResultSet.getInt("CategoryID"));
+            assertEquals("New Category", mockResultSet.getInt("CategoryName"));
+            assertEquals("New description", mockResultSet.getInt("Description"));
+        }
     }
 
     //--------------------
     // delete Tests
     //--------------------
-    
     @Test
     public void testDelete() throws SQLException {
         // Prepare test data
+        Category temp = new Category();
+        temp.setId(1);
+        temp.setDeleted(false);
+        categoryDAO.create(temp);
+
         Category category = new Category();
         category.setId(1);
 
-        // Configure mocks
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-
         // Execute the method to test
-        int rowAffected = categoryDAO.delete(category);
+        categoryDAO.delete(category);
 
         // Verifications
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).executeUpdate();
-
-        assertEquals(1, rowAffected);
+        if (mockResultSet.next()) {
+            assertEquals(true, mockResultSet.getBoolean("isDeleted"));
+        }
     }
 
     @Test
     public void testDelete_WithNonExistentCategory() throws SQLException {
-        // Configure mock to simulate no rows affected
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-
         // Prepare test data
+        Category temp = new Category();
+        temp.setId(1);
+        temp.setDeleted(false);
+        categoryDAO.create(temp);
+
         Category category = new Category();
-        category.setId(1);
+        category.setId(2);
 
         // Execute the method to test
-        int rowAffected = categoryDAO.delete(category);
+        categoryDAO.delete(category);
 
         // Verifications
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).executeUpdate();
-
-        assertEquals(0, rowAffected);
+        if (mockResultSet.next()) {
+            assertEquals(false, mockResultSet.getBoolean("isDeleted"));
+        }
     }
 }

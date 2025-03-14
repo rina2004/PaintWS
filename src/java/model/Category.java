@@ -11,16 +11,27 @@ package model;
 public class Category {
     private int id;
     private String name, describe;
-
-    public Category(int id, String name, String describe) {
+    private boolean isDeleted;
+    
+    public Category() {
+    
+    }
+    
+    public Category(int id, String name, String describe, boolean isDeleted) {
         this.id = id;
         this.name = name;
         this.describe = describe;
+        this.isDeleted = isDeleted;
     }
 
-    public Category() {
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+    
     public int getId() {
         return id;
     }
