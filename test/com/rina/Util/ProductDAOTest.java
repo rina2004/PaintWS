@@ -76,12 +76,37 @@ public class ProductDAOTest {
 
         List<Product> products = productDAO.getAll();
 
-        assertNotNull(products);
         assertEquals(2, products.size());
 
-        assertEquals("Paint A", products.get(0).getProductName());
-        assertEquals("Paint B", products.get(1).getProductName());
+        // Kiểm tra dữ liệu sản phẩm thứ nhất
+        Product product1 = products.get(0);
+        assertEquals(1, product1.getProductID());
+        assertEquals("Paint A", product1.getProductName());
+        assertEquals(1.5, product1.getVolume(), 0.001); 
+        assertEquals("Red", product1.getColor());
+        assertEquals(10.5, product1.getUnitPrice(), 0.001); 
+        assertEquals(100, product1.getUnitsInStock());
+        assertEquals(30, product1.getQuantitySold());
+        assertFalse(product1.isDiscontinued());
+        assertEquals("imageA.jpg", product1.getImage());
+        assertEquals("Good quality", product1.getDescription());
+        assertEquals(0.1, product1.getDiscount(), 0.001); 
+        assertTrue(product1.isStatus());
 
+        // Kiểm tra dữ liệu sản phẩm thứ hai
+        Product product2 = products.get(1);
+        assertEquals(2, product2.getProductID());
+        assertEquals("Paint B", product2.getProductName());
+        assertEquals(2.0, product2.getVolume(), 0.001); 
+        assertEquals("Blue", product2.getColor());
+        assertEquals(12.0, product2.getUnitPrice(), 0.001); 
+        assertEquals(50, product2.getUnitsInStock());
+        assertEquals(20, product2.getQuantitySold());
+        assertTrue(product2.isDiscontinued());
+        assertEquals("imageB.jpg", product2.getImage());
+        assertEquals("Premium quality", product2.getDescription());
+        assertEquals(0.2, product2.getDiscount(), 0.001); 
+        assertFalse(product2.isStatus());
     }
 
     @Test
@@ -90,8 +115,6 @@ public class ProductDAOTest {
         when(mockResultSet.next()).thenReturn(false); // Không có dữ liệu
 
         List<Product> products = productDAO.getAll();
-
-        assertNotNull(products);
         assertEquals(0, products.size()); // Kiểm tra danh sách rỗng
     }
 
@@ -136,8 +159,7 @@ public class ProductDAOTest {
         verify(mockPreparedStatement).setBoolean(1, true);
         verify(mockPreparedStatement).setString(2, "Paint A");
         verify(mockPreparedStatement).executeUpdate();
-        
-         
+
     }
 
     @Test
@@ -149,8 +171,7 @@ public class ProductDAOTest {
         verify(mockPreparedStatement).setBoolean(1, false);
         verify(mockPreparedStatement).setString(2, "Paint A");
         verify(mockPreparedStatement).executeUpdate();
-        
-       
+
     }
 
     @Test
@@ -162,7 +183,7 @@ public class ProductDAOTest {
         verify(mockPreparedStatement).setBoolean(1, true);
         verify(mockPreparedStatement).setString(2, "Paint B");
         verify(mockPreparedStatement).executeUpdate();
-        
+
         assertEquals(0, mockPreparedStatement.executeUpdate());
     }
 
@@ -189,7 +210,7 @@ public class ProductDAOTest {
         productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
 
         verify(mockPreparedStatement).executeUpdate();
-        
+
     }
 
     @Test
@@ -209,8 +230,8 @@ public class ProductDAOTest {
         productDAO.insertProduct("", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
         verify(mockPreparedStatement, never()).executeUpdate();
     }
-    
-     @Test
+
+    @Test
     public void testInsertProduct_NullValues() throws Exception {
         productDAO.insertProduct(null, "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
         verify(mockPreparedStatement, never()).executeUpdate();
