@@ -281,11 +281,13 @@ public class ProductDAO extends DBContext {
             return 0; // Trả về 0 nếu pid rỗng hoặc null
         }
 
-        String sql = "DELETE FROM [dbo].[Paints] WHERE ProductID = ?";
+        String sql = "UPDATE [dbo].[Paints] SET Discontinued = ? WHERE ProductID = ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setString(1, pid);
+            st.setBoolean(1, true); // Đánh dấu ngừng bán
+            st.setString(2, pid);
             return st.executeUpdate(); // Trả về số dòng bị ảnh hưởng
         } catch (SQLException e) {
+            e.printStackTrace();
             return 0;
         }
     }

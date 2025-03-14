@@ -82,30 +82,30 @@ public class ProductDAOTest {
         Product product1 = products.get(0);
         assertEquals(1, product1.getProductID());
         assertEquals("Paint A", product1.getProductName());
-        assertEquals(1.5, product1.getVolume(), 0.001); 
+        assertEquals(1.5, product1.getVolume(), 0.001);
         assertEquals("Red", product1.getColor());
-        assertEquals(10.5, product1.getUnitPrice(), 0.001); 
+        assertEquals(10.5, product1.getUnitPrice(), 0.001);
         assertEquals(100, product1.getUnitsInStock());
         assertEquals(30, product1.getQuantitySold());
         assertFalse(product1.isDiscontinued());
         assertEquals("imageA.jpg", product1.getImage());
         assertEquals("Good quality", product1.getDescription());
-        assertEquals(0.1, product1.getDiscount(), 0.001); 
+        assertEquals(0.1, product1.getDiscount(), 0.001);
         assertTrue(product1.isStatus());
 
         // Kiểm tra dữ liệu sản phẩm thứ hai
         Product product2 = products.get(1);
         assertEquals(2, product2.getProductID());
         assertEquals("Paint B", product2.getProductName());
-        assertEquals(2.0, product2.getVolume(), 0.001); 
+        assertEquals(2.0, product2.getVolume(), 0.001);
         assertEquals("Blue", product2.getColor());
-        assertEquals(12.0, product2.getUnitPrice(), 0.001); 
+        assertEquals(12.0, product2.getUnitPrice(), 0.001);
         assertEquals(50, product2.getUnitsInStock());
         assertEquals(20, product2.getQuantitySold());
         assertTrue(product2.isDiscontinued());
         assertEquals("imageB.jpg", product2.getImage());
         assertEquals("Premium quality", product2.getDescription());
-        assertEquals(0.2, product2.getDiscount(), 0.001); 
+        assertEquals(0.2, product2.getDiscount(), 0.001);
         assertFalse(product2.isStatus());
     }
 
@@ -118,31 +118,34 @@ public class ProductDAOTest {
         assertEquals(0, products.size()); // Kiểm tra danh sách rỗng
     }
 
-    //Test delete product
+    // Test delete product
     @Test
     public void testDeleteProduct_Success() throws Exception {
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1); // Xóa thành công
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1); // Cập nhật thành công
 
         int result = productDAO.deleteProduct("P001");
         assertEquals(1, result);
     }
 
+    // Test khi không có sản phẩm nào được cập nhật (ProductID không tồn tại)
     @Test
     public void testDeleteProduct_NotFound() throws Exception {
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0); // Không có sản phẩm nào bị xóa
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0); // Không có dòng nào bị ảnh hưởng
 
         int result = productDAO.deleteProduct("P999");
         assertEquals(0, result);
     }
 
+// Test khi truyền vào chuỗi rỗng
     @Test
     public void testDeleteProduct_EmptyString() {
         int result = productDAO.deleteProduct(""); // Không gọi DB vì `pid` rỗng
         assertEquals(0, result);
     }
 
+// Test khi truyền vào null
     @Test
     public void testDeleteProduct_Null() {
         int result = productDAO.deleteProduct(null); // Không gọi DB vì `pid` null
@@ -184,7 +187,6 @@ public class ProductDAOTest {
         verify(mockPreparedStatement).setString(2, "Paint B");
         verify(mockPreparedStatement).executeUpdate();
 
-        assertEquals(0, mockPreparedStatement.executeUpdate());
     }
 
     @Test
