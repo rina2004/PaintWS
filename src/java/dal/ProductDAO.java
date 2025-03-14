@@ -298,17 +298,21 @@ public class ProductDAO extends DBContext {
 
         // Kiểm tra tham số đầu vào
         if (name == null || name.trim().isEmpty()
+                || image == null || image.trim().isEmpty()
                 || price == null || price.trim().isEmpty()
                 || stock == null || stock.trim().isEmpty()
                 || sold == null || sold.trim().isEmpty()
                 || volume == null || volume.trim().isEmpty()
+                || color == null || color.trim().isEmpty()
+                || description == null || description.trim().isEmpty() 
                 || supplier == null || supplier.trim().isEmpty()
                 || category == null || category.trim().isEmpty()
                 || discontinued == null || discontinued.trim().isEmpty()
                 || status == null || status.trim().isEmpty()) {
 
-            return;
+            return; // Không thực hiện chèn nếu thiếu dữ liệu
         }
+
         // Kiểm tra xem sản phẩm đã tồn tại
         if (productExists(name)) {
             return;
