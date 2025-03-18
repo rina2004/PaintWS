@@ -73,12 +73,37 @@ public class ProductDAOTest {
 
         List<Product> products = productDAO.getAll();
 
-        assertNotNull(products);
         assertEquals(2, products.size());
 
-        assertEquals("Paint A", products.get(0).getProductName());
-        assertEquals("Paint B", products.get(1).getProductName());
+        // Kiểm tra dữ liệu sản phẩm thứ nhất
+        Product product1 = products.get(0);
+        assertEquals(1, product1.getProductID());
+        assertEquals("Paint A", product1.getProductName());
+        assertEquals(1.5, product1.getVolume(), 0.001);
+        assertEquals("Red", product1.getColor());
+        assertEquals(10.5, product1.getUnitPrice(), 0.001);
+        assertEquals(100, product1.getUnitsInStock());
+        assertEquals(30, product1.getQuantitySold());
+        assertFalse(product1.isDiscontinued());
+        assertEquals("imageA.jpg", product1.getImage());
+        assertEquals("Good quality", product1.getDescription());
+        assertEquals(0.1, product1.getDiscount(), 0.001);
+        assertTrue(product1.isStatus());
 
+        // Kiểm tra dữ liệu sản phẩm thứ hai
+        Product product2 = products.get(1);
+        assertEquals(2, product2.getProductID());
+        assertEquals("Paint B", product2.getProductName());
+        assertEquals(2.0, product2.getVolume(), 0.001);
+        assertEquals("Blue", product2.getColor());
+        assertEquals(12.0, product2.getUnitPrice(), 0.001);
+        assertEquals(50, product2.getUnitsInStock());
+        assertEquals(20, product2.getQuantitySold());
+        assertTrue(product2.isDiscontinued());
+        assertEquals("imageB.jpg", product2.getImage());
+        assertEquals("Premium quality", product2.getDescription());
+        assertEquals(0.2, product2.getDiscount(), 0.001);
+        assertFalse(product2.isStatus());
     }
 
     @Test
@@ -87,36 +112,37 @@ public class ProductDAOTest {
         when(mockResultSet.next()).thenReturn(false); // Không có dữ liệu
 
         List<Product> products = productDAO.getAll();
-
-        assertNotNull(products);
         assertEquals(0, products.size()); // Kiểm tra danh sách rỗng
     }
 
-    //Test delete product
+    // Test delete product
     @Test
     public void testDeleteProduct_Success() throws Exception {
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1); // Xóa thành công
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1); // Cập nhật thành công
 
         int result = productDAO.deleteProduct("P001");
         assertEquals(1, result);
     }
 
+    // Test khi không có sản phẩm nào được cập nhật (ProductID không tồn tại)
     @Test
     public void testDeleteProduct_NotFound() throws Exception {
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0); // Không có sản phẩm nào bị xóa
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0); // Không có dòng nào bị ảnh hưởng
 
         int result = productDAO.deleteProduct("P999");
         assertEquals(0, result);
     }
 
+// Test khi truyền vào chuỗi rỗng
     @Test
     public void testDeleteProduct_EmptyString() {
         int result = productDAO.deleteProduct(""); // Không gọi DB vì `pid` rỗng
         assertEquals(0, result);
     }
 
+// Test khi truyền vào null
     @Test
     public void testDeleteProduct_Null() {
         int result = productDAO.deleteProduct(null); // Không gọi DB vì `pid` null
@@ -133,8 +159,7 @@ public class ProductDAOTest {
         verify(mockPreparedStatement).setBoolean(1, true);
         verify(mockPreparedStatement).setString(2, "Paint A");
         verify(mockPreparedStatement).executeUpdate();
-        
-         
+
     }
 
     @Test
@@ -146,8 +171,7 @@ public class ProductDAOTest {
         verify(mockPreparedStatement).setBoolean(1, false);
         verify(mockPreparedStatement).setString(2, "Paint A");
         verify(mockPreparedStatement).executeUpdate();
-        
-       
+
     }
 
     @Test
@@ -159,8 +183,7 @@ public class ProductDAOTest {
         verify(mockPreparedStatement).setBoolean(1, true);
         verify(mockPreparedStatement).setString(2, "Paint B");
         verify(mockPreparedStatement).executeUpdate();
-        
-        assertEquals(0, mockPreparedStatement.executeUpdate());
+
     }
 
     @Test
@@ -186,7 +209,7 @@ public class ProductDAOTest {
         productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
 
         verify(mockPreparedStatement).executeUpdate();
-        
+
     }
 
     @Test
@@ -202,15 +225,266 @@ public class ProductDAOTest {
     }
 
     @Test
-    public void testInsertProduct_EmptyValues() throws Exception {
+    public void testInsertProduct_EmptyName() throws Exception {
         productDAO.insertProduct("", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
         verify(mockPreparedStatement, never()).executeUpdate();
     }
-    
-     @Test
-    public void testInsertProduct_NullValues() throws Exception {
+
+    @Test
+    public void testInsertProduct_EmptyImage() throws Exception {
+        productDAO.insertProduct("Paint A", "", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_EmptyPrice() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_EmptyStock() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", "", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_EmptySold() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "1000", "100", "", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_EmptyVolume() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "1000", "100", "20", "", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_EmptyColor() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", "", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_EmptySupplier() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", "Red", "", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_EmptyDecription() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_EmptyCategoryID() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_EmptyDiscontinued() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "1", "", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_AllEmptyInputs() throws Exception {
+        productDAO.insertProduct("", "", "", "", "", "", "", "", "", "", "", "");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_EmptyStatus() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "1", "false", "");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NullName() throws Exception {
         productDAO.insertProduct(null, "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
         verify(mockPreparedStatement, never()).executeUpdate();
     }
 
+    @Test
+    public void testInsertProduct_NullImage() throws Exception {
+        productDAO.insertProduct("Paint A", null, "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NullPrice() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", null, "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NullStock() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", null, "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NullSold() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "1000", "100", null, "1.5", "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NullVolume() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "1000", "100", "20", null, "Red", "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NullColor() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", null, "1", "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NullSupplier() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", "Red", null, "Good quality", "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NullDecription() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", null, "2", "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NullCategoryID() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", null, "false", "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NullDiscontinued() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "1", null, "1");
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NullStatus() throws Exception {
+        productDAO.insertProduct("PaintA", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "1", "false", null);
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_AllNullInputs() throws Exception {
+        productDAO.insertProduct(null, null, null, null, null, null, null, null, null, null, null, null);
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NegativePrice() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "-1", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NegativeStock() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", "-1", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NegativeSold() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "-1", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_NegativeVolume() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "20", "-1", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_ZeroPrice() throws Exception {
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false); // Sản phẩm chưa tồn tại
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+
+        productDAO.insertProduct("Paint A", "image.jpg", "0", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_ZeroStock() throws Exception {
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false); // Sản phẩm chưa tồn tại
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", "0", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_ZeroSold() throws Exception {
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false); // Sản phẩm chưa tồn tại
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "0", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_ZeroVolume() throws Exception {
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false); // Sản phẩm chưa tồn tại
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "20", "0", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_MaxStockValue() throws Exception {
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false); // Sản phẩm chưa tồn tại
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", String.valueOf(Short.MAX_VALUE), "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_StockExceedsMaxValue() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", String.valueOf((long) Short.MAX_VALUE + 1), "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_MaxSoldValue() throws Exception {
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false); // Sản phẩm chưa tồn tại
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", String.valueOf(Integer.MAX_VALUE), "1.5", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
+    @Test
+    public void testInsertProduct_SoldExceedsMaxValue() throws Exception {
+        productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", String.valueOf((long) Integer.MAX_VALUE + 1), "1.5", "Red", "1", "Good quality", "2", "false", "1");
+
+        verify(mockPreparedStatement, never()).executeUpdate();
+    }
 }
