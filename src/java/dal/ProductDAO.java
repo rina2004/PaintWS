@@ -296,7 +296,6 @@ public class ProductDAO extends DBContext {
             String sold, String volume, String color, String supplier,
             String description, String category, String discontinued, String status) {
 
-        // Kiểm tra tham số đầu vào
         if (name == null || name.trim().isEmpty()
                 || image == null || image.trim().isEmpty()
                 || price == null || price.trim().isEmpty()
@@ -304,45 +303,63 @@ public class ProductDAO extends DBContext {
                 || sold == null || sold.trim().isEmpty()
                 || volume == null || volume.trim().isEmpty()
                 || color == null || color.trim().isEmpty()
-                || description == null || description.trim().isEmpty() 
+                || description == null || description.trim().isEmpty()
                 || supplier == null || supplier.trim().isEmpty()
                 || category == null || category.trim().isEmpty()
                 || discontinued == null || discontinued.trim().isEmpty()
                 || status == null || status.trim().isEmpty()) {
-
-            return; // Không thực hiện chèn nếu thiếu dữ liệu
-        }
-
-        // Kiểm tra xem sản phẩm đã tồn tại
-        if (productExists(name)) {
             return;
         }
 
-        String sql = "INSERT INTO Paints (ProductName, SupplierID, CategoryID, Volume, Color, UnitPrice, UnitsInStock, QuantitySold, Discontinued, Image, Description, Status) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try {
+            BigDecimal priceValue = new BigDecimal(price);
+            int stockValue = Integer.parseInt(stock);
+            int soldValue = Integer.parseInt(sold);
+            double volumeValue = Double.parseDouble(volume);
+            int supplierId = Integer.parseInt(supplier);
+            int categoryId = Integer.parseInt(category);
+            boolean discontinuedValue = Boolean.parseBoolean(discontinued);
+            int statusValue = Integer.parseInt(status);
 
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            // Thiết lập các giá trị vào câu lệnh SQL
-            st.setString(1, name);
-            st.setInt(2, Integer.parseInt(supplier));  // SupplierID
-            st.setInt(3, Integer.parseInt(category));  // CategoryID
-            st.setDouble(4, Double.parseDouble(volume));  // Volume
-            st.setString(5, color);
-            st.setBigDecimal(6, new BigDecimal(price));  // UnitPrice
-            st.setInt(7, Integer.parseInt(stock));  // UnitsInStock
-            st.setInt(8, Integer.parseInt(sold));  // QuantitySold
-            st.setBoolean(9, Boolean.parseBoolean(discontinued));  // Discontinued
-            st.setString(10, image);
-            st.setString(11, description);
-            int statusValue = Integer.parseInt(status); // Nếu giá trị là 1 thì còn hàng, 0 thì hết hàng
-            st.setBoolean(12, statusValue == 1); // Cần xác định cách lưu vào DB
+            // Kiểm tra giá trị biên
+            if (priceValue.compareTo(BigDecimal.ZERO) < 0 || stockValue < 0 || soldValue < 0 || volumeValue < 0) {
+                return;
+            }
 
-            // Thực hiện câu lệnh SQL và trả về số dòng bị ảnh hưởng
-            st.executeUpdate();
+            if (stockValue > Short.MAX_VALUE || soldValue > Integer.MAX_VALUE) {
+                return;
+            }
 
-        } catch (SQLException e) { // Hoặc log lỗi
-            // Hoặc log lỗi
-            throw new RuntimeException("Database error occurred!", e);
+            // Giả sử có hàm kiểm tra sản phẩm tồn tại
+            if (productExists(name)) {
+                System.out.println("Sản phẩm đã tồn tại");
+                return;
+            }
+
+            // Tiến hành chèn dữ liệu vào cơ sở dữ liệu (giữ nguyên phần này)
+            String sql = "INSERT INTO Paints (ProductName, SupplierID, CategoryID, Volume, Color, UnitPrice, UnitsInStock, QuantitySold, Discontinued, Image, Description, Status) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            try (PreparedStatement st = connection.prepareStatement(sql)) {
+                st.setString(1, name);
+                st.setInt(2, supplierId);
+                st.setInt(3, categoryId);
+                st.setDouble(4, volumeValue);
+                st.setString(5, color);
+                st.setBigDecimal(6, priceValue);
+                st.setInt(7, stockValue);
+                st.setInt(8, soldValue);
+                st.setBoolean(9, discontinuedValue);
+                st.setString(10, image);
+                st.setString(11, description);
+                st.setBoolean(12, statusValue == 1);
+                st.executeUpdate();
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Dữ liệu không hợp lệ: Sai định dạng số");
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi cơ sở dữ liệu", e);
         }
     }
 
