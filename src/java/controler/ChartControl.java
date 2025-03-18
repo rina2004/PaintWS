@@ -68,7 +68,6 @@ public class ChartControl extends HttpServlet {
 //        List<MonthlySales> monthlySales = dao.getMonthlySales();
 //        Map<String, Object> comparison = dao.compareMonthlyRevenue(month1, month2);
         
-        
         // Set attributes for JSP
         request.setAttribute("bestSellers", bestSellers);
         request.setAttribute("topSellers", topSellers);

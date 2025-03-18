@@ -12,15 +12,6 @@ CREATE TABLE Users (
     Phone NVARCHAR(15) NULL
 );
 
--- Thêm dữ liệu mẫu vào bảng Users
-INSERT INTO Users (UserName, Password, RoleID, Email, Address, Phone)
-VALUES 
-('john_doe', 'password123', 1, 'john@example.com', '123 Main St, City A', '0123456789'),
-('jane_smith', 'password456', 2, 'jane@example.com', '456 Oak Ave, City B', '0987654321'),
-('alex_johnson', 'password789', 1, 'alex@example.com', '789 Pine Blvd, City C', '0112233445'),
-('emma_watson', 'password321', 2, 'emma@example.com', '321 Maple Rd, City D', '0223344556'),
-('michael_brown', 'password654', 1, 'michael@example.com', '654 Elm Dr, City E', '0334455667');
-
 -- Tạo bảng Categories
 CREATE TABLE Categories (
     CategoryID INT IDENTITY(1,1) NOT NULL,
@@ -28,14 +19,6 @@ CREATE TABLE Categories (
     Description NTEXT NULL,
     CONSTRAINT PK_Categories PRIMARY KEY (CategoryID)
 );
-
--- Thêm dữ liệu mẫu vào bảng Categories
-INSERT INTO Categories (CategoryName, Description)
-VALUES 
-(N'Sơn Nội Thất', N'Sơn dành cho không gian nội thất, giúp bề mặt tường trong nhà sáng và bền màu.'),
-(N'Sơn Ngoại Thất', N'Sơn dành cho không gian ngoại thất, có khả năng chống chịu thời tiết khắc nghiệt.'),
-(N'Sơn Lót', N'Sơn lót giúp bề mặt tường mịn màng hơn, tạo lớp nền hoàn hảo trước khi sơn phủ.'),
-(N'Sơn Chống Thấm', N'Sơn chống thấm giúp bảo vệ bề mặt khỏi nước và độ ẩm, tăng độ bền cho công trình.');
 
 -- Tạo bảng Suppliers
 CREATE TABLE Suppliers (
@@ -46,16 +29,6 @@ CREATE TABLE Suppliers (
     Phone NVARCHAR(24) NULL,
     CONSTRAINT PK_Suppliers PRIMARY KEY (SupplierID)
 );
-
--- Thêm dữ liệu mẫu vào bảng Suppliers
-INSERT INTO Suppliers (CompanyName, ContactName, Country, Phone)
-VALUES 
-(N'Công ty TNHH Sơn Đẹp', N'Nguyễn Văn A', N'Việt Nam', N'0901234567'),
-(N'Công ty Cổ phần Sơn Xanh', N'Trần Thị B', N'Việt Nam', N'0912345678'),
-(N'Sơn Quốc Tế Dulux', N'John Smith', N'United Kingdom', N'+441234567890'),
-(N'Công ty TNHH Nippon Paint', N'Hiroshi Tanaka', N'Nhật Bản', N'+81312345678'),
-(N'Sherwin-Williams Company', N'Alice Johnson', N'USA', N'+12123456789'),
-(N'Công ty TNHH Sơn Jotun', N'Lê Minh C', N'Na Uy', N'0987654321');
 
 -- Tạo bảng Paints
 CREATE TABLE Paints (
@@ -82,6 +55,59 @@ CREATE TABLE Paints (
         REFERENCES Categories (CategoryID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
+-- Tạo bảng Orders
+CREATE TABLE Orders (
+    OrderID INT IDENTITY(1,1) NOT NULL,
+    Date DATE NOT NULL,
+    UserID INT NOT NULL,  -- Sử dụng UserID làm khóa ngoại thay vì UserName
+    TotalMoney MONEY NULL,
+    Status BIT NOT NULL,
+    CONSTRAINT PK_Orders PRIMARY KEY (OrderID),
+    CONSTRAINT FK_Orders_Users FOREIGN KEY (UserID)
+        REFERENCES Users (UserID) ON DELETE NO ACTION
+);
+
+-- Tạo bảng OrderDetails
+CREATE TABLE OrderDetails (
+    OrderID INT NOT NULL,
+    ProductID INT NOT NULL,
+    Quantity DECIMAL(10, 2) NOT NULL,  -- Đổi sang DECIMAL để tăng độ chính xác
+    UnitPrice MONEY NULL,
+    Discount FLOAT NULL,
+    CONSTRAINT PK_OrderDetails PRIMARY KEY (OrderID, ProductID),
+    CONSTRAINT FK_OrderDetails_Products FOREIGN KEY (ProductID)
+        REFERENCES Paints (ProductID) ON DELETE CASCADE,
+    CONSTRAINT FK_OrderDetails_Orders FOREIGN KEY (OrderID)
+        REFERENCES Orders (OrderID) ON DELETE CASCADE
+);
+
+-- Thêm dữ liệu mẫu vào bảng Users
+INSERT INTO Users (UserName, Password, RoleID, Email, Address, Phone)
+VALUES 
+('john_doe', 'password123', 1, 'john@example.com', '123 Main St, City A', '0123456789'),
+('jane_smith', 'password456', 2, 'jane@example.com', '456 Oak Ave, City B', '0987654321'),
+('alex_johnson', 'password789', 1, 'alex@example.com', '789 Pine Blvd, City C', '0112233445'),
+('emma_watson', 'password321', 2, 'emma@example.com', '321 Maple Rd, City D', '0223344556'),
+('michael_brown', 'password654', 1, 'michael@example.com', '654 Elm Dr, City E', '0334455667');
+
+-- Thêm dữ liệu mẫu vào bảng Categories
+INSERT INTO Categories (CategoryName, Description)
+VALUES 
+(N'Sơn Nội Thất', N'Sơn dành cho không gian nội thất, giúp bề mặt tường trong nhà sáng và bền màu.'),
+(N'Sơn Ngoại Thất', N'Sơn dành cho không gian ngoại thất, có khả năng chống chịu thời tiết khắc nghiệt.'),
+(N'Sơn Lót', N'Sơn lót giúp bề mặt tường mịn màng hơn, tạo lớp nền hoàn hảo trước khi sơn phủ.'),
+(N'Sơn Chống Thấm', N'Sơn chống thấm giúp bảo vệ bề mặt khỏi nước và độ ẩm, tăng độ bền cho công trình.');
+
+-- Thêm dữ liệu mẫu vào bảng Suppliers
+INSERT INTO Suppliers (CompanyName, ContactName, Country, Phone)
+VALUES 
+(N'Công ty TNHH Sơn Đẹp', N'Nguyễn Văn A', N'Việt Nam', N'0901234567'),
+(N'Công ty Cổ phần Sơn Xanh', N'Trần Thị B', N'Việt Nam', N'0912345678'),
+(N'Sơn Quốc Tế Dulux', N'John Smith', N'United Kingdom', N'+441234567890'),
+(N'Công ty TNHH Nippon Paint', N'Hiroshi Tanaka', N'Nhật Bản', N'+81312345678'),
+(N'Sherwin-Williams Company', N'Alice Johnson', N'USA', N'+12123456789'),
+(N'Công ty TNHH Sơn Jotun', N'Lê Minh C', N'Na Uy', N'0987654321');
+
 -- Thêm dữ liệu mẫu vào bảng Paints
 INSERT INTO Paints (ProductName, SupplierID, CategoryID, Volume, Color, UnitPrice, UnitsInStock, QuantitySold, StarRating, Discontinued, Image, Description, ReleaseDate, Discount, Status)
 VALUES 
@@ -98,42 +124,16 @@ VALUES
 (N'Sơn Lót Chống Kiềm Ngoại Thất Đặc Biệt X8', 5, 2, 18.00, N'Vàng', 2814000, 150, 90, 5, 0, 'https://product.hstatic.net/1000403408/product/18l_moi_jotun_x8_cfe10279d6c54e29bd6e2f70d9ab0a19_master.png', N'Sơn lót chống kiềm ngoại thất cao cấp được Color8 sản xuất với các tính năng nổi bật:Độ che phủ cao, độ bền màu cao, Chống kiềm hóa, rêu mốc.', '2023-05-15', 0.05, 1),
 (N'Sơn Mịn Nội Thất Nano Cao Cấp K300', 2, 1, 18.00, N'Xanh', 2231000, 100, 70, 5, 0, 'https://product.hstatic.net/1000403408/product/son_bong_mo_18l_mocup_b0baa588ad1242499a2bdbdf7f3fca46_master.png', N'Sơn nội thất lau chùi hiệu quả là loại sơn nội thất cao cấp, giải pháp giúp tường nhà bạn luôn tươi mới, sạch sáng nhờ công nghệ tiên tiến ngăn vết bẩn thấm sâu vào màng sơn khiến chúng dễ dàng bị đánh bật chỉ với chiếc khăn ướt hoặc xà phòng mà không hề làm tổn hại màng sơn.', '2023-05-15', 0.05, 1);
 
--- Tạo bảng Orders
-CREATE TABLE Orders (
-    OrderID INT IDENTITY(1,1) NOT NULL,
-    Date DATE NOT NULL,
-    UserID INT NOT NULL,  -- Sử dụng UserID làm khóa ngoại thay vì UserName
-    TotalMoney MONEY NULL,
-    Status BIT NOT NULL,
-    CONSTRAINT PK_Orders PRIMARY KEY (OrderID),
-    CONSTRAINT FK_Orders_Users FOREIGN KEY (UserID)
-        REFERENCES Users (UserID) ON DELETE NO ACTION
-);
-
 -- Thêm dữ liệu mẫu vào bảng Orders
 INSERT INTO Orders (Date, UserID, TotalMoney, Status)
 VALUES 
-('2024-01-15', 1, 3000000, 1),  -- Đơn hàng của người dùng có UserID = 1
+('2023-01-15', 1, 3000000, 1),  -- Đơn hàng của người dùng có UserID = 1
 ('2024-01-20', 2, 2845000, 1),  -- Đơn hàng của người dùng có UserID = 2
 ('2024-01-22', 3, 2490000, 0),  -- Đơn hàng của người dùng có UserID = 3
 ('2024-01-25', 1, 2500000, 1),  -- Đơn hàng thứ 2 của người dùng có UserID = 1
 ('2024-01-30', 4, 4400000, 1),  -- Đơn hàng của người dùng có UserID = 4
 ('2024-02-02', 2, 2845000, 0),  -- Đơn hàng thứ 2 của người dùng có UserID = 2
 ('2024-02-05', 5, 6000000, 1);  -- Đơn hàng của người dùng có UserID = 5
-
--- Tạo bảng OrderDetails
-CREATE TABLE OrderDetails (
-    OrderID INT NOT NULL,
-    ProductID INT NOT NULL,
-    Quantity DECIMAL(10, 2) NOT NULL,  -- Đổi sang DECIMAL để tăng độ chính xác
-    UnitPrice MONEY NULL,
-    Discount FLOAT NULL,
-    CONSTRAINT PK_OrderDetails PRIMARY KEY (OrderID, ProductID),
-    CONSTRAINT FK_OrderDetails_Products FOREIGN KEY (ProductID)
-        REFERENCES Paints (ProductID) ON DELETE CASCADE,
-    CONSTRAINT FK_OrderDetails_Orders FOREIGN KEY (OrderID)
-        REFERENCES Orders (OrderID) ON DELETE CASCADE
-);
 
 -- Thêm dữ liệu mẫu vào bảng OrderDetails
 INSERT INTO OrderDetails (OrderID, ProductID, Quantity, UnitPrice, Discount)

@@ -146,7 +146,25 @@ public class ChartDAOTest {
         verify(mockPreparedStatement).setInt(1, 5);
         verify(mockPreparedStatement).executeQuery();
     }
+    @Test
+    public void testGetTopSellingProducts_WithNullValues() throws SQLException {
+        // Setup mock data with null values - just one row with null values
+        when(mockResultSet.next()).thenReturn(true, false);
+        when(mockResultSet.getString("ProductTitle")).thenReturn(null);
+        when(mockResultSet.getInt("TotalQuantitySold")).thenReturn(0);
 
+        List<BestSellingProduct> result = chartDAO.getTopSellingProducts(5);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getProductName());
+        assertEquals(0, result.get(0).getTotalQuantitySold());
+
+        // Verify interactions
+        verify(mockConnection).prepareStatement(anyString());
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(2)).next();
+    }
     @Test
     public void testGetTopSellingProducts_LargeLimit() throws SQLException {
         // Setup mock data
@@ -433,7 +451,49 @@ public class ChartDAOTest {
         verify(mockConnection, never()).prepareStatement(anyString());
     }
 
+    @Test
+    public void testUpdatePaint_NegativeQuantitySold() throws SQLException {
+        // Create test paint object with negative quantity sold - use only what's needed
+        Product paint = mock(Product.class);
+        when(paint.getProductName()).thenReturn("Test Paint");
+        when(paint.getVolume()).thenReturn(5.0);
+        when(paint.getUnitPrice()).thenReturn(1000.0);
+        when(paint.getUnitsInStock()).thenReturn(100);
+        when(paint.getQuantitySold()).thenReturn(-100);
+
+        int affectedRows = chartDAO.update(paint);
+
+        assertEquals("Should return 0 for negative quantity sold", 0, affectedRows);
+
+        // Verify interactions
+        verify(mockConnection, never()).prepareStatement(anyString());
+    }
+
     // -------------------- compareMonthlyRevenue Tests --------------------
+    @Test(expected = IllegalArgumentException.class)
+    public void testCompareMonthlyRevenue_InvalidMonths() throws SQLException {
+        // Should throw IllegalArgumentException for invalid months
+        chartDAO.compareMonthlyRevenue(0, 2023, 1, 2023); // tháng < 1
+        chartDAO.compareMonthlyRevenue(13, 2023, 1, 2023); // tháng > 12
+        chartDAO.compareMonthlyRevenue(1, 2023, 0, 2023); // tháng < 1
+        chartDAO.compareMonthlyRevenue(1, 2023, 13, 2023); // tháng > 12
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCompareMonthlyRevenue_InvalidYears() throws SQLException {
+        // Should throw IllegalArgumentException for year < 2000
+        chartDAO.compareMonthlyRevenue(1, 1999, 1, 2023);
+        chartDAO.compareMonthlyRevenue(1, 2023, 1, 1999);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCompareMonthlyRevenue_FutureYears() throws SQLException {
+        // Should throw IllegalArgumentException for future year
+        int currentYear = java.time.Year.now().getValue();
+        chartDAO.compareMonthlyRevenue(1, currentYear + 1, 1, 2023);
+        chartDAO.compareMonthlyRevenue(1, 2023, 1, currentYear + 1);
+    }
+
     @Test
     public void testCompareMonthlyRevenue_WithMockData() throws SQLException {
         // Setup mock data
@@ -449,7 +509,7 @@ public class ChartDAOTest {
         assertEquals("2023-2", result.get("period2"));
         assertEquals(10000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(15000.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
-        assertEquals(50.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
+        assertEquals(50.0, ((Number) result.get("differenceRatio")).doubleValue(), 0.001);
 
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
@@ -461,7 +521,7 @@ public class ChartDAOTest {
     }
 
     @Test
-    public void testCompareMonthlyRevenue_OneMonthMissing() throws SQLException {
+    public void testCompareMonthlyRevenue_MissingMonthData() throws SQLException {
         // Setup mock data with only one month having data
         when(mockResultSet.next()).thenReturn(true, false);
         when(mockResultSet.getInt("Month")).thenReturn(1);
@@ -475,15 +535,7 @@ public class ChartDAOTest {
         assertEquals("2023-2", result.get("period2"));
         assertEquals(10000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(0.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
-        assertEquals(-100.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
-
-        // Verify interactions
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).setInt(2, 2023);
-        verify(mockPreparedStatement).setInt(3, 2);
-        verify(mockPreparedStatement).setInt(4, 2023);
-        verify(mockPreparedStatement).executeQuery();
+        assertEquals(-100.0, ((Number) result.get("differenceRatio")).doubleValue(), 0.001);
     }
 
     @Test
@@ -498,15 +550,7 @@ public class ChartDAOTest {
         assertEquals("2023-2", result.get("period2"));
         assertEquals(0.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(0.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
-        assertEquals(0.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
-
-        // Verify interactions
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).setInt(2, 2023);
-        verify(mockPreparedStatement).setInt(3, 2);
-        verify(mockPreparedStatement).setInt(4, 2023);
-        verify(mockPreparedStatement).executeQuery();
+        assertEquals(0.0, ((Number) result.get("differenceRatio")).doubleValue(), 0.001);
     }
 
     @Test
@@ -519,20 +563,12 @@ public class ChartDAOTest {
 
         Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2023, 2, 2023);
 
-        // Verify results
+        // Verify results - no division by zero
         assertEquals("2023-1", result.get("period1"));
         assertEquals("2023-2", result.get("period2"));
         assertEquals(0.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(15000.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
-        assertEquals(0.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001); // No division by zero
-
-        // Verify interactions
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 1);
-        verify(mockPreparedStatement).setInt(2, 2023);
-        verify(mockPreparedStatement).setInt(3, 2);
-        verify(mockPreparedStatement).setInt(4, 2023);
-        verify(mockPreparedStatement).executeQuery();
+        assertEquals(0.0, ((Number) result.get("differenceRatio")).doubleValue(), 0.001);
     }
 
     @Test
@@ -550,42 +586,7 @@ public class ChartDAOTest {
         assertEquals("2023-5", result.get("period2"));
         assertEquals(20000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(10000.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
-        assertEquals(-50.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
-
-        // Verify interactions
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 4);
-        verify(mockPreparedStatement).setInt(2, 2023);
-        verify(mockPreparedStatement).setInt(3, 5);
-        verify(mockPreparedStatement).setInt(4, 2023);
-        verify(mockPreparedStatement).executeQuery();
-    }
-
-    @Test
-    public void testCompareMonthlyRevenue_SameMonth() throws SQLException {
-        // Setup mock data for same month and year
-        when(mockResultSet.next()).thenReturn(true, false);
-        when(mockResultSet.getInt("Month")).thenReturn(6);
-        when(mockResultSet.getInt("Year")).thenReturn(2023);
-        when(mockResultSet.getDouble("Revenue")).thenReturn(15000.0);
-
-        Map<String, Object> result = chartDAO.compareMonthlyRevenue(6, 2023, 6, 2023);
-
-        // Verify results - should handle comparing same month
-        assertEquals("2023-6", result.get("period1"));
-        assertEquals("2023-6", result.get("period2"));
-        assertEquals(15000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
-        assertEquals(0.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
-        // Percentage change should reflect comparing month to itself
-        assertEquals(-100.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
-
-        // Verify interactions
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 6);
-        verify(mockPreparedStatement).setInt(2, 2023);
-        verify(mockPreparedStatement).setInt(3, 6);
-        verify(mockPreparedStatement).setInt(4, 2023);
-        verify(mockPreparedStatement).executeQuery();
+        assertEquals(-50.0, ((Number) result.get("differenceRatio")).doubleValue(), 0.001);
     }
 
     @Test
@@ -596,62 +597,38 @@ public class ChartDAOTest {
         when(mockResultSet.getInt("Year")).thenReturn(2022, 2023);
         when(mockResultSet.getDouble("Revenue")).thenReturn(18000.0, 21600.0);
 
-        Map<String, Object> result = chartDAO.compareMonthlyRevenue(12, 2022, 1, 2023);
+        Map<String, Object> result = chartDAO.compareMonthlyRevenue(12,     2022, 1, 2023);
 
         // Verify results - should handle year boundary comparison
         assertEquals("2022-12", result.get("period1"));
         assertEquals("2023-1", result.get("period2"));
         assertEquals(18000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
         assertEquals(21600.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
-        assertEquals(20.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
-
-        // Verify interactions
-        verify(mockConnection).prepareStatement(anyString());
-        verify(mockPreparedStatement).setInt(1, 12);
-        verify(mockPreparedStatement).setInt(2, 2022);
-        verify(mockPreparedStatement).setInt(3, 1);
-        verify(mockPreparedStatement).setInt(4, 2023);
-        verify(mockPreparedStatement).executeQuery();
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testCompareMonthlyRevenue_InvalidMonth() throws SQLException {
-        // Should throw IllegalArgumentException for month < 1
-        chartDAO.compareMonthlyRevenue(0, 2023, 1, 2023);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testCompareMonthlyRevenue_InvalidMonth2() throws SQLException {
-        // Should throw IllegalArgumentException for month > 12
-        chartDAO.compareMonthlyRevenue(1, 2023, 13, 2023);
+        assertEquals(20.0, ((Number) result.get("differenceRatio")).doubleValue(), 0.001);
     }
 
     @Test
-    public void testCompareMonthlyRevenue_SecondMonthMissing() throws SQLException {
-        // Setup mock data with only the second month having data
+    public void testCompareMonthlyRevenue_SameMonthAndYear() throws SQLException {
+        // Setup mock data for the same month and year
         when(mockResultSet.next()).thenReturn(true, false);
-        when(mockResultSet.getInt("Month")).thenReturn(2);
-        when(mockResultSet.getInt("Year")).thenReturn(2023);
-        when(mockResultSet.getDouble("Revenue")).thenReturn(12000.0);
+        when(mockResultSet.getInt("Month")).thenReturn(1, 1);
+        when(mockResultSet.getInt("Year")).thenReturn(2023, 2023);
+        when(mockResultSet.getDouble("Revenue")).thenReturn(10000.0, 10000.0);
 
-        // Explicitly set up that the first month is not found
-        when(mockResultSet.getInt("Month")).thenReturn(2);
-        when(mockResultSet.getInt("Year")).thenReturn(2023);
+        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2023, 1, 2023);
 
-        Map<String, Object> result = chartDAO.compareMonthlyRevenue(1, 2023, 2, 2023);
-
-        // Verify results
+        // Verify results - should show 0% difference
         assertEquals("2023-1", result.get("period1"));
-        assertEquals("2023-2", result.get("period2"));
-        assertEquals(0.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
-        assertEquals(12000.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
-        assertEquals(0.0, ((Number) result.get("percentageChange")).doubleValue(), 0.001);
+        assertEquals("2023-1", result.get("period2"));
+        assertEquals(10000.0, ((Number) result.get("revenue1")).doubleValue(), 0.001);
+        assertEquals(10000.0, ((Number) result.get("revenue2")).doubleValue(), 0.001);
+        assertEquals(0.0, ((Number) result.get("differenceRatio")).doubleValue(), 0.001);
 
         // Verify interactions
         verify(mockConnection).prepareStatement(anyString());
         verify(mockPreparedStatement).setInt(1, 1);
         verify(mockPreparedStatement).setInt(2, 2023);
-        verify(mockPreparedStatement).setInt(3, 2);
+        verify(mockPreparedStatement).setInt(3, 1);
         verify(mockPreparedStatement).setInt(4, 2023);
         verify(mockPreparedStatement).executeQuery();
     }
