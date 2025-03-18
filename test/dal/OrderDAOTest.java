@@ -84,7 +84,7 @@ public class OrderDAOTest {
 
         // 🔍 Kiểm tra trước khi gọi addOrder()
         if (emptyCart.getListItems().isEmpty()) {
-            System.out.println("🛑 Giỏ hàng rỗng, không thể đặt hàng.");
+            System.out.println("Giỏ hàng rỗng, không thể đặt hàng.");
             return; // Không gọi addOrder nếu giỏ hàng rỗng
         }
 
