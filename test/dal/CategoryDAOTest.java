@@ -85,7 +85,7 @@ public class CategoryDAOTest {
         Category category = null;
 
         NullPointerException e = assertThrows(NullPointerException.class, () -> categoryDAO.create(category));
-        assertEquals("Cannot invoke a null category", e.getMessage());
+        assertEquals("Cannot invoke \"model.Category.getName()\" because \"c\" is null", e.getMessage());
     }
     
     @Test
@@ -95,6 +95,36 @@ public class CategoryDAOTest {
         category.setName("New Category");
         category.setDescribe("New category description");
 
+        // Execute the method to test
+        categoryDAO.create(category);
+
+        // Configure mocks
+        when(mockPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
+        
+        SQLException ex = assertThrows(SQLException.class, () -> categoryDAO.create(category));
+        assertEquals(null, ex.getMessage());
+    }
+    
+    @Test
+    public void testCreate_NameBoundary() throws SQLException {
+        Category category = new Category();
+        category.setName("A".repeat(100));
+        category.setDescribe("New category description");
+        // Execute the method to test
+        categoryDAO.create(category);
+
+        // Configure mocks
+        when(mockPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
+        
+        SQLException ex = assertThrows(SQLException.class, () -> categoryDAO.create(category));
+        assertEquals(null, ex.getMessage());
+    }
+    
+    @Test
+    public void testCreate_DescriptionBoundary() throws SQLException {
+        Category category = new Category();
+        category.setName("New Category");
+        category.setDescribe("D".repeat(1000));
         // Execute the method to test
         categoryDAO.create(category);
 
