@@ -407,50 +407,50 @@ public class ChartDAOTest {
     }
 
     @Test
-public void testUpdatePaint_ProductNameTooLong() throws SQLException {
-    // Create test paint object with product name > 100 characters
-    Product paint = mock(Product.class);
-    // Create a string that is 101 characters long
-    StringBuilder longName = new StringBuilder();
-    for (int i = 0; i < 101; i++) {
-        longName.append("a");
-    }
-    when(paint.getProductName()).thenReturn(longName.toString());
-    // Remove the unnecessary stubbing for getVolume()
-    
-    int affectedRows = chartDAO.update(paint);
-    
-    assertEquals("Should return 0 for product name > 100 characters", 0, affectedRows);
-    
-    // Verify no interactions with prepared statement
-    verify(mockConnection, never()).prepareStatement(anyString());
-}
+    public void testUpdatePaint_ProductNameTooLong() throws SQLException {
+        // Create test paint object with product name > 100 characters
+        Product paint = mock(Product.class);
+        // Create a string that is 101 characters long
+        StringBuilder longName = new StringBuilder();
+        for (int i = 0; i < 101; i++) {
+            longName.append("a");
+        }
+        when(paint.getProductName()).thenReturn(longName.toString());
+        // Remove the unnecessary stubbing for getVolume()
 
-@Test
-public void testUpdatePaint_ColorTooLong() throws SQLException {
-    // Create test paint object with color > 50 characters
-    Product paint = mock(Product.class);
-    when(paint.getProductName()).thenReturn("Test Paint");
-    // We need to keep these because the validation happens in order
-    when(paint.getVolume()).thenReturn(5.0);
-    when(paint.getUnitPrice()).thenReturn(1000.0);
-    when(paint.getUnitsInStock()).thenReturn(100);
-    when(paint.getQuantitySold()).thenReturn(100);
-    
-    // Create a color string that is 51 characters long
-    StringBuilder longColor = new StringBuilder();
-    for (int i = 0; i < 51; i++) {
-        longColor.append("c");
+        int affectedRows = chartDAO.update(paint);
+
+        assertEquals("Should return 0 for product name > 100 characters", 0, affectedRows);
+
+        // Verify no interactions with prepared statement
+        verify(mockConnection, never()).prepareStatement(anyString());
     }
-    when(paint.getColor()).thenReturn(longColor.toString());
-    
-    int affectedRows = chartDAO.update(paint);
-    
-    assertEquals("Should return 0 for color > 50 characters", 0, affectedRows);
-    
-    // Verify no interactions with prepared statement
-    verify(mockConnection, never()).prepareStatement(anyString());
-}
+
+    @Test
+    public void testUpdatePaint_ColorTooLong() throws SQLException {
+        // Create test paint object with color > 50 characters
+        Product paint = mock(Product.class);
+        when(paint.getProductName()).thenReturn("Test Paint");
+        // We need to keep these because the validation happens in order
+        when(paint.getVolume()).thenReturn(5.0);
+        when(paint.getUnitPrice()).thenReturn(1000.0);
+        when(paint.getUnitsInStock()).thenReturn(100);
+        when(paint.getQuantitySold()).thenReturn(100);
+
+        // Create a color string that is 51 characters long
+        StringBuilder longColor = new StringBuilder();
+        for (int i = 0; i < 51; i++) {
+            longColor.append("c");
+        }
+        when(paint.getColor()).thenReturn(longColor.toString());
+
+        int affectedRows = chartDAO.update(paint);
+
+        assertEquals("Should return 0 for color > 50 characters", 0, affectedRows);
+
+        // Verify no interactions with prepared statement
+        verify(mockConnection, never()).prepareStatement(anyString());
+    }
 
     @Test
     public void testUpdatePaint_NegativeVolume() throws SQLException {
