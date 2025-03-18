@@ -147,6 +147,7 @@ public class ChartDAOTest {
         verify(mockPreparedStatement).setInt(1, 5);
         verify(mockPreparedStatement).executeQuery();
     }
+
     @Test
     public void testGetTopSellingProducts_WithNullValues() throws SQLException {
         // Setup mock data with null values - just one row with null values
@@ -166,6 +167,7 @@ public class ChartDAOTest {
         verify(mockPreparedStatement).executeQuery();
         verify(mockResultSet, times(2)).next();
     }
+
     @Test
     public void testGetTopSellingProducts_LargeLimit() throws SQLException {
         // Setup mock data
@@ -405,6 +407,52 @@ public class ChartDAOTest {
     }
 
     @Test
+public void testUpdatePaint_ProductNameTooLong() throws SQLException {
+    // Create test paint object with product name > 100 characters
+    Product paint = mock(Product.class);
+    // Create a string that is 101 characters long
+    StringBuilder longName = new StringBuilder();
+    for (int i = 0; i < 101; i++) {
+        longName.append("a");
+    }
+    when(paint.getProductName()).thenReturn(longName.toString());
+    // Remove the unnecessary stubbing for getVolume()
+    
+    int affectedRows = chartDAO.update(paint);
+    
+    assertEquals("Should return 0 for product name > 100 characters", 0, affectedRows);
+    
+    // Verify no interactions with prepared statement
+    verify(mockConnection, never()).prepareStatement(anyString());
+}
+
+@Test
+public void testUpdatePaint_ColorTooLong() throws SQLException {
+    // Create test paint object with color > 50 characters
+    Product paint = mock(Product.class);
+    when(paint.getProductName()).thenReturn("Test Paint");
+    // We need to keep these because the validation happens in order
+    when(paint.getVolume()).thenReturn(5.0);
+    when(paint.getUnitPrice()).thenReturn(1000.0);
+    when(paint.getUnitsInStock()).thenReturn(100);
+    when(paint.getQuantitySold()).thenReturn(100);
+    
+    // Create a color string that is 51 characters long
+    StringBuilder longColor = new StringBuilder();
+    for (int i = 0; i < 51; i++) {
+        longColor.append("c");
+    }
+    when(paint.getColor()).thenReturn(longColor.toString());
+    
+    int affectedRows = chartDAO.update(paint);
+    
+    assertEquals("Should return 0 for color > 50 characters", 0, affectedRows);
+    
+    // Verify no interactions with prepared statement
+    verify(mockConnection, never()).prepareStatement(anyString());
+}
+
+    @Test
     public void testUpdatePaint_NegativeVolume() throws SQLException {
         // Create test paint object with negative volume
         Product paint = mock(Product.class);
@@ -598,7 +646,7 @@ public class ChartDAOTest {
         when(mockResultSet.getInt("Year")).thenReturn(2022, 2023);
         when(mockResultSet.getDouble("Revenue")).thenReturn(18000.0, 21600.0);
 
-        Map<String, Object> result = chartDAO.compareMonthlyRevenue(12,     2022, 1, 2023);
+        Map<String, Object> result = chartDAO.compareMonthlyRevenue(12, 2022, 1, 2023);
 
         // Verify results - should handle year boundary comparison
         assertEquals("2022-12", result.get("period1"));

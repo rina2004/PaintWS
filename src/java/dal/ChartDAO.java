@@ -110,14 +110,16 @@ public class ChartDAO extends DBContext {
     public int update(Product paint) {
         // Validation conditions
         if (paint == null 
-                || paint.getProductName() == null
-                || paint.getProductName().trim().isEmpty()
-                || paint.getVolume() < 0
-                || paint.getUnitPrice() < 0
-                || paint.getUnitsInStock() < 0
-                || paint.getQuantitySold() < 0) { // Add this condition
-            return 0;
-        }
+            || paint.getProductName() == null
+            || paint.getProductName().trim().isEmpty()
+            || paint.getProductName().length() > 100  
+            || paint.getVolume() < 0
+            || paint.getUnitPrice() < 0
+            || paint.getUnitsInStock() < 0
+            || paint.getQuantitySold() < 0
+            || (paint.getColor() != null && paint.getColor().length() > 50)) { 
+        return 0;
+    }
         String sql = """
             UPDATE Paints 
             SET ProductName = ?, Volume = ?, 
