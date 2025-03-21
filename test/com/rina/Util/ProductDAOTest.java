@@ -206,12 +206,19 @@ public class ProductDAOTest {
     public void testInsertProduct_ValidData() throws Exception {
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false); // Sản phẩm chưa tồn tại
-
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1); // Chèn thành công
 
         productDAO.insertProduct("Paint A", "image.jpg", "10.5", "100", "20", "1.5", "Red", "1", "Good quality", "2", "false", "1");
 
-        verify(mockPreparedStatement).executeUpdate();
+        // Kiểm tra xem phương thức insert có được gọi không
+        verify(mockPreparedStatement, times(1)).executeUpdate();
+
+        // Giả lập kiểm tra xem sản phẩm đã tồn tại sau khi insert
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getInt(1)).thenReturn(1);
+
+        boolean exists = productDAO.productExists("Paint A");
+        assertTrue(exists); // Kiểm tra sản phẩm đã tồn tại trong DB sau khi insert
 
     }
 
@@ -225,6 +232,10 @@ public class ProductDAOTest {
 
         // Đảm bảo rằng không gọi `executeUpdate()`
         verify(mockPreparedStatement, never()).executeUpdate();
+
+        // Kiểm tra sản phẩm vẫn tồn tại như cũ
+        boolean exists = productDAO.productExists("Paint A");
+        assertTrue(exists); // Sản phẩm đã tồn tại từ trước
     }
 
     @Test

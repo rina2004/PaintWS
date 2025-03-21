@@ -287,7 +287,6 @@ public class ProductDAO extends DBContext {
             st.setString(2, pid);
             return st.executeUpdate(); // Trả về số dòng bị ảnh hưởng
         } catch (SQLException e) {
-            e.printStackTrace();
             return 0;
         }
     }
@@ -465,5 +464,7 @@ public class ProductDAO extends DBContext {
             System.out.println(e);
         }
     }
+    
+    
 
 }
