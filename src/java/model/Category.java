@@ -11,14 +11,24 @@ package model;
 public class Category {
     private int id;
     private String name, describe;
+    private boolean isDeleted;
+    private int totalSold;
 
-    public Category(int id, String name, String describe) {
+    public Category(int id, String name, String describe, boolean isDeleted) {
         this.id = id;
         this.name = name;
         this.describe = describe;
     }
 
     public Category() {
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     public int getId() {
@@ -45,10 +55,12 @@ public class Category {
         this.describe = describe;
     }
 
-    @Override
-    public String toString() {
-        return "Category{" + "id=" + id + ", name=" + name + ", describe=" + describe + '}';
+    public int getTotalSold() {
+        return totalSold;
     }
-    
+
+    public void setTotalSold(int totalSold) {
+        this.totalSold = totalSold;
+    }
     
 }
