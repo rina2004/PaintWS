@@ -4,7 +4,6 @@ package dal;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 import context.DBContext;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -60,13 +59,40 @@ public class CategoryDAO extends DBContext {
         }
         return null;
     }
-    
-     public static void main(String[] args) {
+
+    public void addCategory(String name, String description) {
+        String sql = "INSERT INTO [dbo].[Categories] ([CategoryName], [Description]) VALUES (?, ?)";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, name);
+            st.setString(2, description);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+
+    public boolean isCategoryExist(String name) {
+        String sql = "SELECT 1 FROM [dbo].[Categories] WHERE CategoryName = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, name);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
         CategoryDAO dao = new CategoryDAO();
         List<Category> list = dao.getAll();
-         for (Category o : list) {
-             System.out.println(o); 
-         }
+        for (Category o : list) {
+            System.out.println(o);
+        }
     }
 
 }
