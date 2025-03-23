@@ -5,6 +5,8 @@ package dal;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 import context.DBContext;
+import dal.CategoryDAO;
+import dal.SupplierDAO;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,10 +23,8 @@ import model.Supplier;
  */
 public class ProductDAO extends DBContext {
 
-    public CategoryDAO cd;
-    public SupplierDAO sd;
-    private static final String CATEGORY_ID = "CategoryID";
-    private static final String SUPPLIER_ID = "SupplerID";
+    private final CategoryDAO cd = new CategoryDAO();
+    private final SupplierDAO sd = new SupplierDAO();
 
     public List<Product> getAll() {
         List<Product> list = new ArrayList<>();
@@ -33,8 +33,8 @@ public class ProductDAO extends DBContext {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
-                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
+                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
+                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
                 Product p = new Product(
                         rs.getInt("ProductID"),
                         rs.getString("ProductName"),
@@ -78,8 +78,8 @@ public class ProductDAO extends DBContext {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
-                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
+                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
+                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
                 Product p = new Product(
                         rs.getInt("ProductID"),
                         rs.getString("ProductName"),
@@ -109,8 +109,8 @@ public class ProductDAO extends DBContext {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
-                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
+                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
+                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
                 Product p = new Product(
                         rs.getInt("ProductID"),
                         rs.getString("ProductName"),
@@ -140,8 +140,8 @@ public class ProductDAO extends DBContext {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
-                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
+                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
+                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
                 Product p = new Product(
                         rs.getInt("ProductID"),
                         rs.getString("ProductName"),
@@ -174,8 +174,8 @@ public class ProductDAO extends DBContext {
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
-                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
+                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
+                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
 
                 Product p = new Product(
                         rs.getInt("ProductID"),
@@ -209,8 +209,8 @@ public class ProductDAO extends DBContext {
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
-                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
+                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
+                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
 
                 Product p = new Product(
                         rs.getInt("ProductID"),
@@ -244,8 +244,8 @@ public class ProductDAO extends DBContext {
             st.setString(1, name); // This stays the same
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Category c = cd.getCategoryById(rs.getInt(CATEGORY_ID));
-                Supplier s = sd.getSupplierById(rs.getInt(SUPPLIER_ID));
+                Category c = cd.getCategoryById(rs.getInt("CategoryID"));
+                Supplier s = sd.getSupplierById(rs.getInt("SupplierID"));
 
                 Product p = new Product(
                         rs.getInt("ProductID"),
@@ -283,20 +283,18 @@ public class ProductDAO extends DBContext {
         return 0; // Trả về 0 nếu không xóa được sản phẩm nào
     }
 
-    public void insertProduct(String name, String image, String price, String stock,
+    public void insert(String name, String image, String price, String stock,
             String sold, String volume, String color, String supplier,
-            String description, String category, String discontinued, String status) {
+            String description, String category, String status) {
 
-        // Kiểm tra xem sản phẩm đã tồn tại
         if (productExists(name)) {
             return;
         }
-
-        String sql = "INSERT INTO Paints (ProductName, SupplierID, CategoryID, Volume, Color, UnitPrice, UnitsInStock, QuantitySold, Discontinued, Image, Description, Status) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Paints (ProductName, SupplierID, CategoryID, Volume,"
+                + " Color, UnitPrice, UnitsInStock, QuantitySold, Image, Description, Status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement st = connection.prepareStatement(sql)) {
-            // Thiết lập các giá trị vào câu lệnh SQL
             st.setString(1, name);
             st.setInt(2, Integer.parseInt(supplier));  // SupplierID
             st.setInt(3, Integer.parseInt(category));  // CategoryID
@@ -305,16 +303,15 @@ public class ProductDAO extends DBContext {
             st.setBigDecimal(6, new BigDecimal(price));  // UnitPrice
             st.setInt(7, Integer.parseInt(stock));  // UnitsInStock
             st.setInt(8, Integer.parseInt(sold));  // QuantitySold
-            st.setBoolean(9, Boolean.parseBoolean(discontinued));  // Discontinued
-            st.setString(10, image);
-            st.setString(11, description);
+            st.setString(9, image);
+            st.setString(10, description);
             int statusValue = Integer.parseInt(status); // Nếu giá trị là 1 thì còn hàng, 0 thì hết hàng
-            st.setBoolean(12, statusValue == 1); // Cần xác định cách lưu vào DB
+            st.setBoolean(11, statusValue == 1); // Cần xác định cách lưu vào DB
 
-            // Thực hiện câu lệnh SQL và trả về số dòng bị ảnh hưởng
             st.executeUpdate();
 
         } catch (SQLException e) {
+            System.out.println(e);
         }
     }
 

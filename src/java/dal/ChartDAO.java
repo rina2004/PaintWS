@@ -150,13 +150,6 @@ public class ChartDAO extends DBContext {
 
     //Calculates revenue comparison between two months
     public Map<String, Object> compareMonthlyRevenue(int month1, int year1, int month2, int year2) {
-        Map<String, Object> result = new HashMap<>();
-        result.put("period1", year1 + "-" + month1);
-        result.put("period2", year2 + "-" + month2);
-        result.put("revenue1", 0.0);
-        result.put("revenue2", 0.0);
-        result.put("differenceRatio", 0.0);
-
         // validate month
         if (month1 < 1 || month1 > 12 || month2 < 1 || month2 > 12) {
             throw new IllegalArgumentException("Month values must be between 1 and 12");
@@ -171,6 +164,13 @@ public class ChartDAO extends DBContext {
         if (year1 > currentYear || year2 > currentYear) {
             throw new IllegalArgumentException("Cannot compare revenue for future years");
         }
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("period1", year1 + "-" + month1);
+        result.put("period2", year2 + "-" + month2);
+        result.put("revenue1", 0.0);
+        result.put("revenue2", 0.0);
+        result.put("differenceRatio", 0.0);
 
         String sql = """
             SELECT 
@@ -220,30 +220,30 @@ public class ChartDAO extends DBContext {
         }
         return result;
     }
-//    //Retrieves monthly sales data for the current year
-//    public List<MonthlySales> getMonthlySales() {
-//        List<MonthlySales> monthlySales = new ArrayList<>();
-//        String sql = """
-//            SELECT 
-//                MONTH(o.Date) AS Month,
-//                SUM(od.Quantity * od.UnitPrice * (1 - COALESCE(od.Discount, 0))) AS Revenue
-//            FROM Orders o
-//            JOIN OrderDetails od ON o.OrderID = od.OrderID
-//            WHERE YEAR(o.Date) = YEAR(GETDATE())
-//            GROUP BY MONTH(o.Date)
-//            ORDER BY Month;
-//        """;
-//        try (
-//            PreparedStatement st = connection.prepareStatement(sql);
-//            ResultSet rs = st.executeQuery()) {
-//            while (rs.next()) {
-//                int month = rs.getInt("Month");
-//                double revenue = rs.getDouble("Revenue");
-//                monthlySales.add(new MonthlySales(month, revenue));
-//            }
-//        } catch (SQLException e) {
-//            System.out.println(e);
-//        }
-//        return monthlySales;
-//    }
+    //Retrieves monthly sales data for the current year
+    public List<MonthlySales> getMonthlySales() {
+        List<MonthlySales> monthlySales = new ArrayList<>();
+        String sql = """
+            SELECT 
+                MONTH(o.Date) AS Month,
+                SUM(od.Quantity * od.UnitPrice * (1 - COALESCE(od.Discount, 0))) AS Revenue
+            FROM Orders o
+            JOIN OrderDetails od ON o.OrderID = od.OrderID
+            WHERE YEAR(o.Date) = YEAR(GETDATE())
+            GROUP BY MONTH(o.Date)
+            ORDER BY Month;
+        """;
+        try (
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery()) {
+            while (rs.next()) {
+                int month = rs.getInt("Month");
+                double revenue = rs.getDouble("Revenue");
+                monthlySales.add(new MonthlySales(month, revenue));
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return monthlySales;
+    }
 }

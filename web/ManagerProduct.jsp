@@ -105,12 +105,16 @@
                                 <input name="name" type="text" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label>Image</label>
+                                <label>Link image</label>
                                 <input name="image" type="text" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label>Unit Price(Enter number only)</label>
+                                <label>Unit Price (Enter number only)</label>
                                 <input name="price" type="text" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Volume (Enter number only)</label>
+                                <input name="volume" type="number" class="form-control" required>
                             </div>
                             <div class="form-group">
                                 <label>Units In Stock</label>
@@ -121,15 +125,11 @@
                                 <input name="quantitySold" type="number" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label>Volume (Enter number only)</label>
-                                <input name="volume" type="number" class="form-control" required>
-                            </div>
-                            <div class="form-group">
                                 <label>Color</label>
                                 <input name="color" type="text" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label>Supplier</label>
+                                <label>Supplier </label>
                                 <select name="supplierID" class="form-select" aria-label="Select Supplier" required>
                                     <c:forEach items="${listS}" var="s">
                                         <option value="${s.id}">${s.companyName}</option>
@@ -143,7 +143,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Category</label>
+                                <label>Category </label>
                                 <select name="category" class="form-select" aria-label="Default select example">
                                     <c:forEach items="${listC}" var="o">
                                         <option value="${o.id}">${o.name}</option>
@@ -152,10 +152,7 @@
                             </div>
                             <!-- Thêm thuộc tính Discontinued và Status -->
                             <div class="form-group">
-                                <label>Discontinued (Ngừng bán)</label>
-                                <input name="discontinued" type="checkbox" class="form-check-input">                            </div>
-                            <div class="form-group">
-                                <label>Status (Trạng thái)</label>
+                                <label>Status (Trạng thái) </label>
                                 <select name="status" class="form-select" required>
                                     <option value="1">Còn hàng</option>
                                     <option value="0">Hết hàng</option>

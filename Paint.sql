@@ -39,7 +39,7 @@ CREATE TABLE Paints (
     Volume DECIMAL(5,2) NULL,              -- Dung tích sản phẩm (lít)
     Color NVARCHAR(50) NULL,               -- Màu sắc của sơn
     UnitPrice MONEY NULL,                  -- Giá bán
-    UnitsInStock SMALLINT NULL,            -- Số lượng hàng tồn kho
+    UnitsInStock INT NULL,				   -- Số lượng hàng tồn kho
     QuantitySold INT NULL,                 -- Số lượng đã bán
     StarRating SMALLINT NULL CHECK (StarRating BETWEEN 1 AND 5),  -- Đánh giá sao từ 1-5
     Discontinued BIT NULL,                 -- Ngừng bán
