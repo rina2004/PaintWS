@@ -283,20 +283,12 @@ public class ProductDAO extends DBContext {
         return 0; // Trả về 0 nếu không xóa được sản phẩm nào
     }
 
-    public void insertProduct(String name, String image, String price, String stock,
+    public void insert(String name, String image, String price, String stock,
             String sold, String volume, String color, String supplier,
-            String description, String category, String discontinued, String status) {
-
-        // Kiểm tra xem sản phẩm đã tồn tại
-        if (productExists(name)) {
-            return;
-        }
-
-        String sql = "INSERT INTO Paints (ProductName, SupplierID, CategoryID, Volume, Color, UnitPrice, UnitsInStock, QuantitySold, Discontinued, Image, Description, Status) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+            String description, String category, String status) {
+        String sql = "INSERT INTO Paints (ProductName, SupplierID, CategoryID, Volume, Color, UnitPrice, UnitsInStock, QuantitySold, Image, Description, Status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
-            // Thiết lập các giá trị vào câu lệnh SQL
             st.setString(1, name);
             st.setInt(2, Integer.parseInt(supplier));  // SupplierID
             st.setInt(3, Integer.parseInt(category));  // CategoryID
@@ -305,31 +297,28 @@ public class ProductDAO extends DBContext {
             st.setBigDecimal(6, new BigDecimal(price));  // UnitPrice
             st.setInt(7, Integer.parseInt(stock));  // UnitsInStock
             st.setInt(8, Integer.parseInt(sold));  // QuantitySold
-            st.setBoolean(9, Boolean.parseBoolean(discontinued));  // Discontinued
-            st.setString(10, image);
-            st.setString(11, description);
+            st.setString(9, image);
+            st.setString(10, description);
             int statusValue = Integer.parseInt(status); // Nếu giá trị là 1 thì còn hàng, 0 thì hết hàng
-            st.setBoolean(12, statusValue == 1); // Cần xác định cách lưu vào DB
-
-            // Thực hiện câu lệnh SQL và trả về số dòng bị ảnh hưởng
+            st.setBoolean(11, statusValue == 1);
             st.executeUpdate();
-
         } catch (SQLException e) {
+            System.out.println(e);
         }
     }
 
-// Phương thức kiểm tra xem sản phẩm đã tồn tại hay chưa
-    private boolean productExists(String name) {
+    public boolean productExisted(String name) {
         String sql = "SELECT COUNT(*) FROM Paints WHERE ProductName = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, name);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return rs.getInt(1) > 0; // Nếu có sản phẩm, trả về true
+                return rs.getInt(1) > 0; // Nếu có trả về true
             }
         } catch (SQLException e) {
+            System.out.println(e);
         }
-        return false; // Nếu không có sản phẩm, trả về false
+        return false;
     }
 
     public int editProduct(String name, String image, String price, String stock,
