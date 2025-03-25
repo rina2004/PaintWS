@@ -82,28 +82,28 @@ public class AddCategoryControl extends HttpServlet {
 
         // Kiểm tra rỗng
         if (name == null || name.trim().isEmpty()) {
-            session.setAttribute("errorC", "Tên danh mục không được để trống");
+            session.setAttribute("errorC", "Category name cannot be empty");
             response.sendRedirect("loadCategory");
             return;
         }
 
         // Kiểm tra độ dài
         if (name.length() > 50) {
-            session.setAttribute("errorC", "Tên danh mục không được vượt quá 50 ký tự");
+            session.setAttribute("errorC", "Category names cannot exceed 50 characters");
             response.sendRedirect("loadCategory");
             return;
         }
 
         // Kiểm tra trùng
         if (dao.isCategoryExist(name)) {
-            session.setAttribute("errorC", "Tên danh mục không được trùng");
+            session.setAttribute("errorC", "Category names cannot be duplicated.");
             response.sendRedirect("loadCategory");
             return;
         }
 
         // Nếu không có lỗi
         dao.addCategory(name, description);
-        session.setAttribute("successC", "Thêm danh mục thành công!");
+        session.setAttribute("successC", "Category added successfully!");
         response.sendRedirect("loadCategory");
     }
 

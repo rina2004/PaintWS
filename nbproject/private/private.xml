@@ -4,10 +4,9 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/E:/FPT/ky5/SWT301/Tcode/PaintWS/web/Category.jsp</file>
-            <file>file:/E:/FPT/ky5/SWT301/Tcode/PaintWS/src/java/controler/AddControl.java</file>
-            <file>file:/E:/FPT/ky5/SWT301/Tcode/PaintWS/src/java/dal/CategoryDAO.java</file>
             <file>file:/E:/FPT/ky5/SWT301/Tcode/PaintWS/src/java/controler/AddCategoryControl.java</file>
-            <file>file:/E:/FPT/ky5/SWT301/Tcode/PaintWS/src/java/controler/LoadCategoryControl.java</file>
+            <file>file:/E:/FPT/ky5/SWT301/Tcode/PaintWS/src/java/dal/CategoryDAO.java</file>
+            <file>file:/E:/FPT/ky5/SWT301/Tcode/PaintWS/test/controler/CategoryControlNGTest.java</file>
         </group>
     </open-files>
 </project-private>

@@ -87,6 +87,9 @@
                                     <a href="Chart" class="ms-3 btn btn-outline-secondary"> 
                                         <i class="fas fa-chart-bar"></i> Best-Selling Chart
                                     </a>
+                                    <a href="loadCategory" class="ms-3 btn btn-outline-secondary"> 
+                                        <i class="fas fa-user-cog"></i> Manage Category
+                                    </a>
                                 </c:if>
                             </div>
                         </div>
