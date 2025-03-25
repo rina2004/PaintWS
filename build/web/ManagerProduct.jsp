@@ -1,7 +1,7 @@
 <%-- 
     Document   : ManagerProduct
     Created on : Oct 26, 2024, 10:58:44 AM
-    Author     : anhbu
+    Author     : lytu
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -40,10 +40,10 @@
                         </div>
                     </div>
                 </div>
-                <c:if test="${not idemessage}">
-                    <div class="alert alert-info">
+                <c:if test="${not empty sessionScope.message}">
+                    <div class="alert-info">
                         ${sessionScope.message}
-                        <% session.removeAttribute("message"); %> <!-- Clear message after displaying -->
+                        <% session.removeAttribute("message"); %> 
                     </div>
                 </c:if>
                 <table class="table table-striped table-hover">
@@ -97,31 +97,31 @@
                         <div class="modal-body">                    
                             <div class="form-group">
                                 <label>Name</label>
-                                <input name="name" type="text" class="form-control" required>
+                                <input name="name" type="text" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Image</label>
-                                <input name="image" type="text" class="form-control" required>
+                                <input name="image" type="text" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Unit Price (Enter number only)</label>
-                                <input name="price" type="number" class="form-control" required>
+                                <input name="price" type="number" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Units In Stock</label>
-                                <input name="unitsInStock" type="number" class="form-control" required>
+                                <input name="unitsInStock" type="number" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Quantity Sold</label>
-                                <input name="quantitySold" type="number" class="form-control" required>
+                                <input name="quantitySold" type="number" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Volume (Enter number only)</label>
-                                <input name="volume" type="number" class="form-control" required>
+                                <input name="volume" type="number" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Color</label>
-                                <input name="color" type="text" class="form-control" required>
+                                <input name="color" type="text" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Supplier</label>
