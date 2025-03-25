@@ -18,26 +18,32 @@
                     </div>
 
                     <%
-        Cookie[] cookies = request.getCookies();
-        String savedUser = "";
-        String savedPass = "";
-    
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("username")) {
-                    savedUser = cookie.getValue();
-                }
-                if (cookie.getName().equals("password")) {
-                    savedPass = cookie.getValue();
-                }
-            }
-        }
+                    Cookie[] cookies = request.getCookies();
+                    String savedUser = "";
+                    String savedPass = "";
+
+                    if (cookies != null) {
+                        for (Cookie cookie : cookies) {
+                            if (cookie.getName().equals("username")) {
+                                savedUser = cookie.getValue();
+                            }
+                            if (cookie.getName().equals("password")) {
+                                savedPass = cookie.getValue();
+                            }
+                        }
+                    }
                     %>
                     <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
                         <form class="form-signin" action="login" method="post">
                             <h1 class="h3 mb-3 font-weight-normal" style="text-align: center">Sign in</h1>
                             <p class="text-danger">${mess}</p>
-                            
+
+                            <c:if test="${not empty successMessage}">
+                                <div class="alert alert-success text-center" name="alert alert-success">
+                                    ${successMessage}
+                                </div>
+                            </c:if>
+
                             <input name="user" type="text" id="inputEmail" class="form-control" placeholder="Username" required autofocus="" value="<%= savedUser %>">
                             <input name="pass" type="password" id="inputPassword" class="form-control" placeholder="Password" required="" value="<%= savedPass %>">
 

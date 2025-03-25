@@ -9,28 +9,52 @@ package model;
  * @author anhbu
  */
 public class User {
-    private String userName, password, address, phone, email;
-    private int roleID, userID;
 
-    public User(String userName, String password, String address, String phone, String email, int roleID, int userID) {
-        this.userName = userName;
+    private String username;
+    private String password;
+    private String fullname;
+    private String email;
+    private String phoneNumber;
+    private String country;
+    private boolean acceptTerms;
+    private boolean acceptMarketing;
+
+    private int userID;
+    private int roleID;
+
+    // Constructors
+    public User() {
+    }
+
+    public User(String username, String password, String fullname, String email,
+            String phoneNumber, String country, boolean acceptTerms, boolean acceptMarketing) {
+        this.username = username;
         this.password = password;
-        this.address = address;
-        this.phone = phone;
+        this.fullname = fullname;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.country = country;
+        this.acceptTerms = acceptTerms;
+        this.acceptMarketing = acceptMarketing;
+    }
+
+    public User(String username, String password, String country, String phoneNumber, String email, int roleID, int userID) {
+        this.username = username;
+        this.password = password;
+        this.country = country;
+        this.phoneNumber = phoneNumber;
         this.email = email;
         this.roleID = roleID;
         this.userID = userID;
     }
 
-    public User() {
+    // Getters and Setters
+    public String getUsername() {
+        return username;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -41,20 +65,12 @@ public class User {
         this.password = password;
     }
 
-    public String getAddress() {
-        return address;
+    public String getFullname() {
+        return fullname;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setFullname(String fullName) {
+        this.fullname = fullName;
     }
 
     public String getEmail() {
@@ -65,12 +81,36 @@ public class User {
         this.email = email;
     }
 
-    public int getRoleID() {
-        return roleID;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setRoleID(int roleID) {
-        this.roleID = roleID;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public boolean isAcceptTerms() {
+        return acceptTerms;
+    }
+
+    public void setAcceptTerms(boolean acceptTerms) {
+        this.acceptTerms = acceptTerms;
+    }
+
+    public boolean isAcceptMarketing() {
+        return acceptMarketing;
+    }
+
+    public void setAcceptMarketing(boolean acceptMarketing) {
+        this.acceptMarketing = acceptMarketing;
     }
 
     public int getUserID() {
@@ -81,7 +121,11 @@ public class User {
         this.userID = userID;
     }
 
-    
-    
-    
+    public int getRoleID() {
+        return roleID;
+    }
+
+    public void setRoleID(int roleID) {
+        this.roleID = roleID;
+    }
 }

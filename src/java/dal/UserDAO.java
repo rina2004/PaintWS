@@ -15,20 +15,20 @@ import model.User;
 public class UserDAO extends DBContext {
 
     public User login(String username, String password) {
-        String sql = "SELECT * FROM [dbo].[Users] WHERE UserName = ? and Password = ?";
+        String sql = "SELECT * FROM [dbo].[Users] WHERE username = ? AND password = ?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, username);
             st.setString(2, password);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                User u = new User(rs.getString("userName"),
+                User u = new User(rs.getString("username"),
                         rs.getString("password"),
-                        rs.getString("address"),
-                        rs.getString("phone"),
+                        rs.getString("country"),
+                        rs.getString("phoneNumber"),
                         rs.getString("email"),
                         rs.getInt("roleID"),
-                        rs.getInt("userID")); // Lấy userID từ kết quả truy vấn
+                        rs.getInt("userID"));
                 return u;
             }
         } catch (SQLException e) {
@@ -38,7 +38,7 @@ public class UserDAO extends DBContext {
     }
 
     public User checkExistingUser(String username, String email, String phone) {
-        String sql = "SELECT * FROM [dbo].[Users] WHERE UserName = ? OR Email = ? OR Phone = ?";
+        String sql = "SELECT * FROM [dbo].[Users] WHERE username = ? OR email = ? OR phoneNumber = ?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, username);
@@ -46,7 +46,7 @@ public class UserDAO extends DBContext {
             st.setString(3, phone);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                return new User(rs.getString("userName"),
+                return new User(rs.getString("username"),
                         rs.getString("password"),
                         rs.getString("address"),
                         rs.getString("phone"),
@@ -58,6 +58,82 @@ public class UserDAO extends DBContext {
             System.out.println(e);
         }
         return null;
+    }
+
+    public boolean registerUser(User user) {
+        String sql = "INSERT INTO Users (username, password, fullname, email, phoneNumber, country, acceptTerms, acceptMarketing, roleID) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 2)";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, user.getUsername());
+            statement.setString(2, user.getPassword());
+            statement.setString(3, user.getFullname());
+            statement.setString(4, user.getEmail());
+            statement.setString(5, user.getPhoneNumber());
+            statement.setString(6, user.getCountry());
+            statement.setBoolean(7, user.isAcceptTerms());
+            statement.setBoolean(8, user.isAcceptMarketing());
+
+            int rowsInserted = statement.executeUpdate();
+            return rowsInserted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean isUsernameExists(String username) {
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, username);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean isEmailExists(String email) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, email);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean isPhoneExists(String phoneNumber) {
+        String sql = "SELECT COUNT(*) FROM users WHERE phoneNumber = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, phoneNumber);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     public void signUp(String username, String password, String email, String phone, String address) {
@@ -228,5 +304,4 @@ public class UserDAO extends DBContext {
         }
         return false; // Trả về false nếu không tìm thấy người dùng hoặc không cập nhật được
     }
-
 }

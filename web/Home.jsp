@@ -64,7 +64,7 @@
                                 <c:if test="${sessionScope.acc != null}">
                                     <!-- Hiển thị lời chào và tên người dùng -->
                                     <span class="me-3 align-self-center">
-                                        Hello, ${sessionScope.acc.userName}!
+                                        Hello, ${sessionScope.acc.username}!
                                     </span>
                                     <a href="logout" class="me-3 btn btn-outline-secondary"> 
                                         <i class="fas fa-user-alt"></i> Log out

@@ -52,7 +52,7 @@ public class LoginControl extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        request.getRequestDispatcher("/Login.jsp").forward(request, response);
     }
 
     /**
@@ -76,7 +76,7 @@ public class LoginControl extends HttpServlet {
 
         if (a == null) {
             request.setAttribute("mess", "Wrong user or password !!!");
-            request.getRequestDispatcher("Login.jsp").forward(request, response);
+            request.getRequestDispatcher("/Login.jsp").forward(request, response);
         } else {
             HttpSession session = request.getSession();
             session.setAttribute("acc", a);
