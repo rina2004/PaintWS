@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Failed suite [PaintWS]">
+  <test thread-count="5" name="controler.LoginControlNGTest(failed)">
+    <classes>
+      <class name="controler.LoginControlNGTest">
+        <methods>
+          <include name="testLogin" invocation-numbers="4 1 0 3 2"/>
+          <include name="setup"/>
+          <include name="teardown"/>
+        </methods>
+      </class> <!-- controler.LoginControlNGTest -->
+    </classes>
+  </test> <!-- controler.LoginControlNGTest(failed) -->
+</suite> <!-- Failed suite [PaintWS] -->
