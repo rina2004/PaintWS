@@ -5,8 +5,6 @@ package dal;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 import context.DBContext;
-import dal.CategoryDAO;
-import dal.SupplierDAO;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -283,20 +281,15 @@ public class ProductDAO extends DBContext {
         return 0; // Trả về 0 nếu không xóa được sản phẩm nào
     }
 
-    public void insertProduct(String name, String image, String price, String stock,
+    public boolean insert(String name, String image, String price, String stock,
             String sold, String volume, String color, String supplier,
-            String description, String category, String discontinued, String status) {
-
-        // Kiểm tra xem sản phẩm đã tồn tại
-        if (productExists(name)) {
-            return;
+            String description, String category, String status) {
+        if (productExisted(name)) {
+            return false;
         }
-
-        String sql = "INSERT INTO Paints (ProductName, SupplierID, CategoryID, Volume, Color, UnitPrice, UnitsInStock, QuantitySold, Discontinued, Image, Description, Status) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+        String sql = "INSERT INTO Paints (ProductName, SupplierID, CategoryID, Volume, Color, UnitPrice, UnitsInStock, QuantitySold, Image, Description, Status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
-            // Thiết lập các giá trị vào câu lệnh SQL
             st.setString(1, name);
             st.setInt(2, Integer.parseInt(supplier));  // SupplierID
             st.setInt(3, Integer.parseInt(category));  // CategoryID
@@ -305,31 +298,174 @@ public class ProductDAO extends DBContext {
             st.setBigDecimal(6, new BigDecimal(price));  // UnitPrice
             st.setInt(7, Integer.parseInt(stock));  // UnitsInStock
             st.setInt(8, Integer.parseInt(sold));  // QuantitySold
-            st.setBoolean(9, Boolean.parseBoolean(discontinued));  // Discontinued
-            st.setString(10, image);
-            st.setString(11, description);
-            int statusValue = Integer.parseInt(status); // Nếu giá trị là 1 thì còn hàng, 0 thì hết hàng
-            st.setBoolean(12, statusValue == 1); // Cần xác định cách lưu vào DB
-
-            // Thực hiện câu lệnh SQL và trả về số dòng bị ảnh hưởng
+            st.setString(9, image);
+            st.setString(10, description);
+            st.setBoolean(11, Integer.parseInt(status) == 1);
             st.executeUpdate();
-
+            return true;
         } catch (SQLException e) {
+            System.out.println(e);
+            return false;
         }
     }
 
-// Phương thức kiểm tra xem sản phẩm đã tồn tại hay chưa
-    private boolean productExists(String name) {
+    public boolean productExisted(String name) {
         String sql = "SELECT COUNT(*) FROM Paints WHERE ProductName = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, name);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return rs.getInt(1) > 0; // Nếu có sản phẩm, trả về true
+                return rs.getInt(1) > 0; // Nếu có trả về true
             }
         } catch (SQLException e) {
+            System.out.println(e);
         }
-        return false; // Nếu không có sản phẩm, trả về false
+        return false;
+    }
+
+    public boolean productExist(String name) {
+        String sql = "SELECT COUNT(*) FROM Paints WHERE ProductName = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Return true if count is > 0
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checking product existence: " + e);
+        }
+        return false;
+    }
+
+    public boolean insertProduct(String name, String image, String price, String stock,
+            String sold, String volume, String color, String supplier,
+            String description, String category, String status) {
+        // First, check if product already exists
+        if (productExist(name)) {
+            return false;
+        }
+
+        // Product Name Validation
+        if (name == null || name.trim().isEmpty()) {
+            return false;
+        }
+        if(name.length() < 10 || name.length() > 100){
+            return false;
+        }
+        if (!name.contains("Sơn")) {
+            return false;
+        }
+        if (!name.matches("[\\p{L} ]+")) {
+            return false;
+        }
+        // Image Validation
+        if (image == null || image.trim().isEmpty()
+                || !image.matches("^(https?://)?([\\w-]+\\.)+[\\w-]+(/[\\w-./?%&=]*)?$")) {
+            return false;
+        }
+
+        // Price Validation
+        double priceValue;
+        if(price.isEmpty()){
+            return false;
+        }
+        try {
+            priceValue = Double.parseDouble(price);
+            if (priceValue <= 0 || priceValue > 100_000_000) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        // Stock Validation
+        int stockValue;
+        if(stock.isEmpty()){
+            return false;
+        }
+        try {
+            stockValue = Integer.parseInt(stock);
+            if (stockValue < 0 || stockValue > 1_000) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        // Sold Validation
+        int soldValue;
+        if(sold.isEmpty()){
+            return false;
+        }
+        try {
+            soldValue = Integer.parseInt(sold);
+            if (soldValue < 0 || soldValue > 1_000) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        // Volume Validation
+        double volumeValue;
+        if(volume.isEmpty()){
+            return false;
+        }
+        try {
+            volumeValue = Double.parseDouble(volume);
+            if (volumeValue <= 0 || volumeValue > 100) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        // Color Validation
+        if (color == null || color.trim().isEmpty()
+                || !color.matches("^[a-zA-Z1-9\\s]+$") || color.length() > 50) {
+            return false;
+        }
+
+        // Supplier and Category Validation
+        try {
+            Integer.parseInt(supplier);
+            Integer.parseInt(category);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        // Status Validation
+        try {
+            int statusValue = Integer.parseInt(status);
+            if (statusValue != 0 && statusValue != 1) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        // If all validations pass, proceed with insertion
+        String sql = "INSERT INTO Paints (ProductName, SupplierID, CategoryID, Volume, Color, UnitPrice, UnitsInStock, QuantitySold, Image, Description, Status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setString(1, name);
+            st.setInt(2, Integer.parseInt(supplier));  // SupplierID
+            st.setInt(3, Integer.parseInt(category));  // CategoryID
+            st.setDouble(4, volumeValue);  // Volume
+            st.setString(5, color);
+            st.setBigDecimal(6, new BigDecimal(price));  // UnitPrice
+            st.setInt(7, stockValue);  // UnitsInStock
+            st.setInt(8, soldValue);  // QuantitySold
+            st.setString(9, image);
+            st.setString(10, description);
+            st.setBoolean(11, Integer.parseInt(status) == 1);
+            st.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error inserting product: " + e);
+            return false;
+        }
     }
 
     public int editProduct(String name, String image, String price, String stock,

@@ -1,7 +1,7 @@
 <%-- 
     Document   : ManagerProduct
     Created on : Oct 26, 2024, 10:58:44 AM
-    Author     : anhbu
+    Author     : lytu
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -21,7 +21,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <link href="css/manager.css" rel="stylesheet" type="text/css"/>
         <style>
-            img{
+            img {
                 width: 200px;
                 height: 120px;
             }
@@ -36,20 +36,23 @@
                             <h2>Manage <b>Product</b></h2>
                         </div>
                         <div class="col-sm-6">
-                            <a href="#addEmployeeModal"  class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New Product</span></a>
-                            
+                            <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i class="material-icons"></i> <span>Add New Product</span></a>
                         </div>
                     </div>
                 </div>
+                <c:if test="${not empty sessionScope.message}">
+                    <div class="alert-info">
+                        ${sessionScope.message}
+                        <% session.removeAttribute("message"); %> 
+                    </div>
+                </c:if>
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>
-                                <span class="custom-checkbox">
+                            <th><span class="custom-checkbox">
                                     <input type="checkbox" id="selectAll">
                                     <label for="selectAll"></label>
-                                </span>
-                            </th>
+                                </span></th>
                             <th>ID</th>
                             <th>Name</th>
                             <th>Image</th>
@@ -57,8 +60,6 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-
-          
                     <tbody>
                         <c:forEach items="${listP}" var="o">
                             <tr>
@@ -70,63 +71,57 @@
                                 </td>
                                 <td>${o.productID}</td>
                                 <td>${o.productName}</td>
-                                <td>
-                                    <img src="${o.image}">
-                                </td>
+                                <td><img src="${o.image}"></td>
                                 <td><fmt:formatNumber value="${o.unitPrice}" pattern="#,###" /> VND</td>
                                 <td>
-                                    <a href="loadProduct?pid=${o.productID}"  class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
-                                    <a href="delete?pid=${o.productID}" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                                    <a href="loadProduct?pid=${o.productID}" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit"></i></a>
+                                    <a href="delete?pid=${o.productID}" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete"></i></a>
                                 </td>
                             </tr>
                         </c:forEach>
                     </tbody>
                 </table>
-                
             </div>
             <a href="${pageContext.request.contextPath}/home" class="btn btn-primary">Back to home</a>
-
         </div>
-        <!-- Edit Modal HTML -->
-      
 
-
+        <!-- Add Modal HTML -->
         <div id="addEmployeeModal" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form action="add" method="post">
-                        <div class="modal-header">						
+                        <div class="modal-header">                        
                             <h4 class="modal-title">Add Product</h4>
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                         </div>
-                        <div class="modal-body">					
+                        <div class="modal-body">                    
                             <div class="form-group">
                                 <label>Name</label>
-                                <input name="name" type="text" class="form-control" required>
+                                <input name="name" type="text" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Image</label>
-                                <input name="image" type="text" class="form-control" required>
+                                <input name="image" type="text" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label>Unit Price(Enter number only)</label>
-                                <input name="price" type="text" class="form-control" required>
+                                <label>Unit Price (Enter number only)</label>
+                                <input name="price" type="number" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Units In Stock</label>
-                                <input name="unitsInStock" type="number" class="form-control" required>
+                                <input name="unitsInStock" type="number" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Quantity Sold</label>
-                                <input name="quantitySold" type="number" class="form-control" required>
+                                <input name="quantitySold" type="number" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Volume (Enter number only)</label>
-                                <input name="volume" type="number" class="form-control" required>
+                                <input name="volume" type="number" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Color</label>
-                                <input name="color" type="text" class="form-control" required>
+                                <input name="color" type="text" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Supplier</label>
@@ -136,12 +131,10 @@
                                     </c:forEach>
                                 </select>
                             </div>
-
                             <div class="form-group">
                                 <label>Description</label>
                                 <textarea name="description" class="form-control" required></textarea>
                             </div>
-
                             <div class="form-group">
                                 <label>Category</label>
                                 <select name="category" class="form-select" aria-label="Default select example">
@@ -150,10 +143,6 @@
                                     </c:forEach>
                                 </select>
                             </div>
-                            <!-- Thêm thuộc tính Discontinued và Status -->
-                            <div class="form-group">
-                                <label>Discontinued (Ngừng bán)</label>
-                                <input name="discontinued" type="checkbox" class="form-check-input">                            </div>
                             <div class="form-group">
                                 <label>Status (Trạng thái)</label>
                                 <select name="status" class="form-select" required>
@@ -170,8 +159,6 @@
                 </div>
             </div>
         </div>
-
-
         <script src="js/manager.js" type="text/javascript"></script>
     </body>
 </html>
