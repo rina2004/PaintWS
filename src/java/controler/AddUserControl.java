@@ -81,18 +81,51 @@ public class AddUserControl extends HttpServlet {
         String email = request.getParameter("email");
         String role = request.getParameter("roleID");
         
+        String message; // Biến để lưu thông điệp
+        HttpSession session = request.getSession();
+        
+        if(username == null){
+            message = "Không được để trống username.";
+            session.setAttribute("errorU", message); // Đặt thông báo vào session
+            response.sendRedirect("manageracc");
+            return;
+        }
+        if(password == null){
+            message = "Không được để trống password.";
+            session.setAttribute("errorU", message); // Đặt thông báo vào session
+            response.sendRedirect("manageracc");
+            return;
+        }
+        if(address == null){
+            message = "Không được để trống address.";
+            session.setAttribute("errorU", message); // Đặt thông báo vào session
+            response.sendRedirect("manageracc");
+            return;
+        }
+        if(phone == null){
+            message = "Không được để trống phone.";
+            session.setAttribute("errorU", message); // Đặt thông báo vào session
+            response.sendRedirect("manageracc");
+            return;
+        }
+        if(email == null){
+            message = "Không được để trống email.";
+            session.setAttribute("errorU", message); // Đặt thông báo vào session
+            response.sendRedirect("manageracc");
+            return;
+        }
+        
         UserDAO dao = new UserDAO();
         boolean isInserted = dao.insertUser(username, password, email, phone, address, role);
         
-         String message; // Biến để lưu thông điệp
         if (isInserted) {
-            message = "Thêm người dùng thành công."; 
+            message = "Thêm người dùng thành công.";
+            session.setAttribute("successU", message); // Đặt thông báo vào session
         } else {
-            message = "Không thể thể thêm người dùng này vì đã trùng username hoặc email hoặc phone .";
+            message = "Không thể thể thêm người dùng này vì đã trùng username hoặc email hoặc phone.";
+            session.setAttribute("errorU", message); // Đặt thông báo vào session
         }
         
-        HttpSession session = request.getSession();
-        session.setAttribute("Message", message); // Đặt thông báo vào session
         response.sendRedirect("manageracc");
     }
 

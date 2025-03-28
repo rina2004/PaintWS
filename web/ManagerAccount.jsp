@@ -36,6 +36,22 @@
                         </div>
                     </div>
                 </div>
+                <% 
+                    String error = (String) session.getAttribute("errorU"); 
+                    String success = (String) session.getAttribute("successU");
+                %>
+                
+                <% if (success != null) { %>
+                <div class="alert alert-success"><%= success %></div>
+                <% session.removeAttribute("successU"); %>
+                <% } %>
+                
+                <% if (error != null) { %>
+                <div class="alert alert-danger"><%= error %></div>
+                <% session.removeAttribute("errorU"); %>
+                <% } %>
+
+                
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
@@ -49,7 +65,7 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    
+
                     <tbody>
                         <c:forEach items="${listU}" var="user">
                             <tr>
@@ -84,23 +100,23 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Username</label>
-                                <input name="username" type="text" class="form-control" required>
+                                <input name="username" type="text" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Password</label>
-                                <input name="password" type="password" class="form-control" required>
+                                <input name="password" type="password" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Address</label>
-                                <input name="address" type="text" class="form-control" required>
+                                <input name="address" type="text" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Phone</label>
-                                <input name="phone" type="text" class="form-control" required>
+                                <input name="phone" type="text" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                <input name="email" type="email" class="form-control" required>
+                                <input name="email" type="email" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Role</label>
@@ -113,7 +129,7 @@
                         </div>
                         <div class="modal-footer">
                             <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                            <input type="submit" class="btn btn-success" value="Add">
+                            <input type="submit" class="btn btn-success" value="Add" id="addButton">
                         </div>
                     </form>
                 </div>

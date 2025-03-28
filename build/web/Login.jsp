@@ -45,7 +45,7 @@
                                 <input name="remember" value="1" type="checkbox" class="form-check-input" id="exampleCheck1">
                                 <label class="form-check-label" for="exampleCheck1">Remember me</label>
                             </div>
-                            <button class="btn btn-success btn-block" type="submit"><i class="fas fa-sign-in-alt"></i> Sign in</button>
+                            <button class="btn btn-success btn-block" type="submit" id="button"><i class="fas fa-sign-in-alt"></i> Sign in</button>
                             <hr>
                             <a href="Signup.jsp" class="btn btn-primary btn-block"><i class="fas fa-user-plus"></i> Sign up New Account</a>
                         </form>
